@@ -45,7 +45,7 @@ export default function RootLayout({
             // https://tailwindcss.com/docs/background-image
         >
             <body
-                className={`${geistSans.className} antialiased body-scrollbar mx-auto cursor-default`}
+                className={`${geistSans.className} antialiased body-scrollbar container mx-auto cursor-default`}
             >
                 <div className="mx-8 my-4">
                     <div className="text-center">
@@ -65,11 +65,11 @@ export default function RootLayout({
                             */}
                             <main
                                 className="graphs-scrollbar overflow-y-scroll
-                             h-[32rem]  /* 기본 - 브라우저 너비 640px 미만일 때 */
-                             sm:h-[37rem]  /* 브라우저 너비 640px 이상일 때 */
-                             lg:h-[42rem]  /* 브라우저 너비 1024px 이상일 때 */
-                             xl:h-[47rem]  /* 브라우저 너비 1280px 이상일 때 */
-                             2xl:h-[52rem]  /* 브라우저 너비 1536px 이상일 때 */"
+                             h-[30rem]  /* 기본 - 브라우저 너비 640px 미만일 때 */
+                             sm:h-[35rem]  /* 브라우저 너비 640px 이상일 때 */
+                             lg:h-[40rem]  /* 브라우저 너비 1024px 이상일 때 */
+                             xl:h-[45rem]  /* 브라우저 너비 1280px 이상일 때 */
+                             2xl:h-[50rem]  /* 브라우저 너비 1536px 이상일 때 */"
                             >
                                 {children}
                             </main>

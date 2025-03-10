@@ -2,12 +2,20 @@
 
 import { useEffect, useState } from 'react';
 import type { GraphProps, ChartProps } from '@/types/chart_types';
+// nextjs default로 서버사이드 렌더링을 함
 import dynamic from 'next/dynamic';
 const ReactApexChart = dynamic(() => import('react-apexcharts'), {
     ssr: false,
-});
+}); // browser에서만 렌더링해야하므로 ssr을 끔
 
-export default function Summary({ height = 640 }: GraphProps) {
+/*
+GraphProps 대신 any를 써야하는 이유 
+Type error: Type 'OmitWithTag<GraphProps, keyof PageProps, "default">' does not satisfy the constraint '{ [x: string]: never; }'.
+Property 'height' is incompatible with index signature.
+Type 'any' is not assignable to type 'never'.
+*/
+// 컴포넌트는 대문자
+export default function Summary({ height = 640 }: any) {
     const [state, setState] = useState<ChartProps>({
         series: [
             {
@@ -45,13 +53,13 @@ export default function Summary({ height = 640 }: GraphProps) {
         ],
         options: {
             chart: {
-                height: 390,
+                foreColor: '#FFFFFF',
                 type: 'rangeBar',
                 zoom: {
-                    enabled: false,
+                    enabled: true,
                 },
             },
-            colors: ['#EC7D31', '#36BDCB'],
+            colors: ['#EC7D31', '#D6BDCB'],
             plotOptions: {
                 bar: {
                     horizontal: true,
@@ -60,7 +68,7 @@ export default function Summary({ height = 640 }: GraphProps) {
                 },
             },
             title: {
-                text: 'Paygap Disparity',
+                text: 'Summary for Optimization',
             },
             legend: {
                 show: true,
@@ -93,15 +101,12 @@ export default function Summary({ height = 640 }: GraphProps) {
     });
 
     return (
-        <div>
-            <div id="chart">
-                <ReactApexChart
-                    options={state.options}
-                    series={state.series}
-                    type="rangeBar"
-                    height={height}
-                />
-            </div>
-        </div>
+        <ReactApexChart
+            className="mt-2"
+            options={state.options}
+            series={state.series}
+            type="rangeBar"
+            height={height}
+        />
     );
 }
