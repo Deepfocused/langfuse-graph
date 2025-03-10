@@ -33,7 +33,6 @@ const Navbar = () => {
                             className="transition hover:scale-105 hover:text-blue-500"
                         >
                             <Link
-                                // className="mx-3"
                                 href={`/${item || ''}`}
                                 scroll={false}
                                 prefetch={item === ''}
@@ -45,7 +44,7 @@ const Navbar = () => {
                 </div>
             </div>
             <div className="mx-4 my-2 flex items-center justify-center min-[560px]:hidden">
-                <div className="flex gap-4 text-lg font-bold max-[400PX]:text-sm max-[400PX]:gap-3">
+                <div className="flex gap-4 text-lg font-bold max-[400PX]:text-sm max-[400PX]:gap-2.5">
                     {navItems.map((item) => (
                         <div key={item}>
                             <Link

@@ -8,6 +8,7 @@ import Summary from '@/app/(graphs)/summary/page';
 import { motion } from 'framer-motion';
 
 export default function Home() {
+    const height = 320;
     return (
         <>
             <div className="mt-2 mx-4 grid gap-6 md:grid-cols-2">
@@ -26,7 +27,7 @@ export default function Home() {
                         scroll={false}
                         prefetch={true}
                     >
-                        <Time height={360} />
+                        <Time height={height} />
                     </Link>
                 </motion.div>
                 <motion.div
@@ -44,7 +45,7 @@ export default function Home() {
                         scroll={false}
                         prefetch={true}
                     >
-                        <Token height={360} />
+                        <Token height={height} />
                     </Link>
                 </motion.div>
             </div>
@@ -64,7 +65,7 @@ export default function Home() {
                         scroll={false}
                         prefetch={true}
                     >
-                        <Call height={360} />
+                        <Call height={height} />
                     </Link>
                 </motion.div>
                 <motion.div
@@ -82,7 +83,7 @@ export default function Home() {
                         scroll={false}
                         prefetch={true}
                     >
-                        <Summary height={360} />
+                        <Summary height={height} />
                     </Link>
                 </motion.div>
             </div>
