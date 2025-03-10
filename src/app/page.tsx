@@ -21,12 +21,12 @@ export default function Home() {
                     transition={{ duration: 0.2 }}
                 >
                     <Link
-                        className="block p-2 border-2 rounded-xl border-fuchsia-200 shadow-lg shadow-fuchsia-300/50 transition hover:scale-103 hover:shadow-fuchsia-300"
+                        className="block border-2 rounded-xl border-fuchsia-200 shadow-lg shadow-fuchsia-300/50 transition hover:scale-103 hover:shadow-fuchsia-300"
                         href="/time"
                         scroll={false}
                         prefetch={true}
                     >
-                        <Time />
+                        <Time height={360} />
                     </Link>
                 </motion.div>
                 <motion.div
@@ -39,12 +39,12 @@ export default function Home() {
                     transition={{ duration: 0.4 }}
                 >
                     <Link
-                        className="block p-2 border-2 rounded-xl border-violet-200 shadow-lg shadow-violet-300/50 transition hover:scale-103 hover:shadow-violet-300"
-                        href="/time"
+                        className="block border-2 rounded-xl border-violet-200 shadow-lg shadow-violet-300/50 transition hover:scale-103 hover:shadow-violet-300"
+                        href="/token"
                         scroll={false}
                         prefetch={true}
                     >
-                        <Token />
+                        <Token height={360} />
                     </Link>
                 </motion.div>
             </div>
@@ -59,12 +59,12 @@ export default function Home() {
                     transition={{ duration: 0.6 }}
                 >
                     <Link
-                        className="block p-2 border-2 rounded-xl border-fuchsia-200 shadow-lg shadow-fuchsia-300/50 transition hover:scale-103 hover:shadow-fuchsia-300"
-                        href="/time"
+                        className="block border-2 rounded-xl border-fuchsia-200 shadow-lg shadow-fuchsia-300/50 transition hover:scale-103 hover:shadow-fuchsia-300"
+                        href="/call"
                         scroll={false}
                         prefetch={true}
                     >
-                        <Call />
+                        <Call height={360} />
                     </Link>
                 </motion.div>
                 <motion.div
@@ -77,12 +77,12 @@ export default function Home() {
                     transition={{ duration: 0.8 }}
                 >
                     <Link
-                        className="block p-2 border-2 rounded-xl border-violet-200 shadow-lg shadow-violet-300/50 transition hover:scale-103 hover:shadow-violet-300"
-                        href="/time"
+                        className="block border-2 rounded-xl border-violet-200 shadow-lg shadow-violet-300/50 transition hover:scale-103 hover:shadow-violet-300"
+                        href="/summary"
                         scroll={false}
                         prefetch={true}
                     >
-                        <Summary />
+                        <Summary height={360} />
                     </Link>
                 </motion.div>
             </div>

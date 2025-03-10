@@ -58,15 +58,15 @@ export default function RootLayout({
                         <div className="rounded-l-3xl border border-2 border-blue-300 shadow-2xl shadow-blue-300">
                             <Navbar />
                             {/* - 기본: 35rem (560px) - 작은 화면
-                            - lg (1024px): 40rem (640px) - 일반 모니터
-                            - xl (1280px): 45rem (720px) - 큰 모니터
-                            - 2xl (1536px): 50rem (800px) - 초고해상도 */}
+                            - lg (1024px): 40rem (800px) - 일반 모니터
+                            - xl (1280px): 45rem (880px) - 큰 모니터
+                            - 2xl (1536px): 50rem (960px) - 초고해상도 */}
                             <main
                                 className="graphs-scrollbar overflow-y-scroll
                              h-[35rem]
-                             lg:h-[40rem]
-                             xl:h-[45rem] 
-                             2xl:h-[50rem]"
+                             lg:h-[50rem]
+                             xl:h-[55rem] 
+                             2xl:h-[60rem]"
                             >
                                 {children}
                             </main>
