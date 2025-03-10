@@ -102,7 +102,7 @@ export default function Call({ height = 640 }: any) {
 
     return (
         <ReactApexChart
-            className="mt-2"
+            className="mx-8 mt-4"
             options={state.options}
             series={state.series}
             type="rangeBar"

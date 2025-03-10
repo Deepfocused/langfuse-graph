@@ -16,37 +16,23 @@ Type 'any' is not assignable to type 'never'.
 */
 // 컴포넌트는 대문자
 export default function Summary({ height = 640 }: any) {
+    /* 필요 데이터 
+    전체 시간 구하기 - x 축
+    Y축은 모델명
+    각 LLM 별 구간 구하기(길이가 비중)
+    */
+
     const [state, setState] = useState<ChartProps>({
         series: [
             {
                 data: [
                     {
-                        x: 'Operations',
-                        y: [2800, 4500],
+                        x: 'Exaone 3.5',
+                        y: [0, 1],
                     },
                     {
-                        x: 'Customer Success',
-                        y: [3200, 4100],
-                    },
-                    {
-                        x: 'Engineering',
-                        y: [2950, 7800],
-                    },
-                    {
-                        x: 'Marketing',
-                        y: [3000, 4600],
-                    },
-                    {
-                        x: 'Product',
-                        y: [3500, 4100],
-                    },
-                    {
-                        x: 'Data Science',
-                        y: [4500, 6500],
-                    },
-                    {
-                        x: 'Sales',
-                        y: [4100, 5600],
+                        x: 'Llama 3.3',
+                        y: [1, 2],
                     },
                 ],
             },
@@ -55,34 +41,49 @@ export default function Summary({ height = 640 }: any) {
             chart: {
                 foreColor: '#FFFFFF',
                 type: 'rangeBar',
-                zoom: {
+                dropShadow: {
                     enabled: true,
+                    color: '#fff',
+                    top: 0,
+                    left: 0,
+                    blur: 21,
+                    opacity: 0.7,
+                },
+                zoom: {
+                    enabled: false,
                 },
             },
-            colors: ['#EC7D31', '#D6BDCB'],
+            colors: ['#008FFB', '#FF4560'],
             plotOptions: {
                 bar: {
                     horizontal: true,
-                    isDumbbell: true,
-                    dumbbellColors: [['#EC7D31', '#36BDCB']],
+                    distributed: true,
+                    barHeight: '21%',
                 },
             },
             title: {
-                text: 'Summary for Optimization',
+                text: '🎢 LLM Inference Time 🎢',
+                align: 'center',
+                style: {
+                    fontSize: '20px',
+                    fontWeight: 'bold',
+                    color: '#FFFFFF',
+                },
             },
             legend: {
                 show: true,
                 showForSingleSeries: true,
                 position: 'top',
                 horizontalAlign: 'left',
-                customLegendItems: ['Female', 'Male'],
+                customLegendItems: ['Exaone 3.5', 'Llama 3.3'],
             },
             fill: {
-                type: 'gradient',
-                gradient: {
-                    gradientToColors: ['#36BDCB'],
-                    inverseColors: false,
-                    stops: [0, 100],
+                type: 'solid',
+                opacity: 0.7,
+            },
+            xaxis: {
+                title: {
+                    text: '⏳ Time ⌛',
                 },
             },
             grid: {
@@ -102,7 +103,7 @@ export default function Summary({ height = 640 }: any) {
 
     return (
         <ReactApexChart
-            className="mt-2"
+            className="mx-8 mt-4"
             options={state.options}
             series={state.series}
             type="rangeBar"

@@ -29,12 +29,10 @@ export default function Time({ height = 640 }: any) {
                     {
                         x: 'Exaone 3.5',
                         y: [0, 1],
-                        // fillColor: '#008FFB',
                     },
                     {
                         x: 'Llama 3.3',
                         y: [1, 2],
-                        // fillColor: '#FF4560',
                     },
                 ],
             },

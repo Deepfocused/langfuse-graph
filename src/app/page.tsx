@@ -8,7 +8,7 @@ import Summary from '@/app/(graphs)/summary/page';
 import { motion } from 'framer-motion';
 
 export default function Home() {
-    const height = 320;
+    const height = 300;
     return (
         <>
             <div className="mt-2 mx-4 grid gap-6 md:grid-cols-2">
