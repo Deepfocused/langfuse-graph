@@ -9,6 +9,12 @@ const ReactApexChart = dynamic(() => import('react-apexcharts'), {
 }); // browser에서만 렌더링해야하므로 ssr을 끔
 
 /*
+요구사항
+agent내 전체 소요시간 타임 라인 뷰 : 전체 중 llm 추론 구간은 어디인지, 비중이 얼마큼인지 보여주기(시간)
+- timeline 차트 사용하기 - 시간에 따른
+*/
+
+/*
 GraphProps 대신 any를 써야하는 이유 
 Type error: Type 'OmitWithTag<GraphProps, keyof PageProps, "default">' does not satisfy the constraint '{ [x: string]: never; }'.
 Property 'height' is incompatible with index signature.
@@ -16,34 +22,46 @@ Type 'any' is not assignable to type 'never'.
 */
 // 컴포넌트는 대문자
 export default function Time({ height = 640 }: any) {
-    /* 필요 데이터 
-    전체 시간 구하기 - x 축
-    Y축은 모델명
-    각 LLM 별 구간 구하기(길이가 비중)
-    */
-
     const [state, setState] = useState<ChartProps>({
         series: [
             {
                 data: [
                     {
                         x: 'Exaone 3.5',
-                        y: [0, 1],
+                        y: [0, 0.5],
                     },
                     {
                         x: 'Llama 3.3',
-                        y: [1, 2],
+                        y: [1, 3],
+                    },
+                    {
+                        x: 'All time',
+                        y: [0, 4],
                     },
                 ],
             },
         ],
         options: {
+            title: {
+                text: '🎢 LLM Inference Time 🎢',
+                align: 'center',
+                style: {
+                    fontSize: '24px',
+                    fontWeight: 'bold',
+                    color: '#FFFFFF',
+                },
+            },
             chart: {
-                foreColor: '#FFFFFF',
+                toolbar: {
+                    show: true,
+                    offsetX: 21,
+                    offsetY: 0,
+                },
                 type: 'rangeBar',
+                foreColor: '#FFFFFF',
                 dropShadow: {
                     enabled: true,
-                    color: '#fff',
+                    color: '#FFFFFF',
                     top: 0,
                     left: 0,
                     blur: 21,
@@ -53,33 +71,32 @@ export default function Time({ height = 640 }: any) {
                     enabled: false,
                 },
             },
-            colors: ['#008FFB', '#FF4560'],
+            colors: ['#69d2e7', '#FF4560', '#AB45C0'],
             plotOptions: {
                 bar: {
                     horizontal: true,
                     distributed: true,
-                    barHeight: '21%',
+                    barHeight: '30%',
                 },
             },
-            title: {
-                text: '🎢 LLM Inference Time 🎢',
-                align: 'center',
+            dataLabels: {
+                enabled: true,
                 style: {
-                    fontSize: '20px',
-                    fontWeight: 'bold',
-                    color: '#FFFFFF',
+                    colors: ['#FFFFFF'],
                 },
             },
             legend: {
                 show: true,
                 showForSingleSeries: true,
                 position: 'top',
-                horizontalAlign: 'left',
+                horizontalAlign: 'center',
+                offsetX: 0,
+                offsetY: -10,
                 customLegendItems: ['Exaone 3.5', 'Llama 3.3'],
             },
             fill: {
                 type: 'solid',
-                opacity: 0.7,
+                opacity: 1,
             },
             xaxis: {
                 title: {
@@ -98,12 +115,31 @@ export default function Time({ height = 640 }: any) {
                     },
                 },
             },
+            tooltip: {
+                theme: 'dark',
+            },
         },
     });
 
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await fetch('/langfuse/time');
+                const result = await response.json();
+
+                setState((prevState) => ({
+                    ...prevState,
+                }));
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+        fetchData();
+    }, []);
+
     return (
         <ReactApexChart
-            className="mx-8 mt-4"
+            className="mx-8 mt-6"
             options={state.options}
             series={state.series}
             type="rangeBar"
