@@ -9,6 +9,11 @@ const ReactApexChart = dynamic(() => import('react-apexcharts'), {
 }); // browser에서만 렌더링해야하므로 ssr을 끔
 
 /*
+agent내 멀티 llm별 입출력 토큰 사용량 비교 뷰: 각 역할을 하는 llm별로 토큰 사용량이 많이 다름을 보여주기
+- Column Chart 사용 - 시간에 따른
+*/
+
+/*
 GraphProps 대신 any를 써야하는 이유 
 Type error: Type 'OmitWithTag<GraphProps, keyof PageProps, "default">' does not satisfy the constraint '{ [x: string]: never; }'.
 Property 'height' is incompatible with index signature.
@@ -19,93 +24,91 @@ export default function Token({ height = 640 }: any) {
     const [state, setState] = useState<ChartProps>({
         series: [
             {
-                data: [
-                    {
-                        x: 'Operations',
-                        y: [2800, 4500],
-                    },
-                    {
-                        x: 'Customer Success',
-                        y: [3200, 4100],
-                    },
-                    {
-                        x: 'Engineering',
-                        y: [2950, 7800],
-                    },
-                    {
-                        x: 'Marketing',
-                        y: [3000, 4600],
-                    },
-                    {
-                        x: 'Product',
-                        y: [3500, 4100],
-                    },
-                    {
-                        x: 'Data Science',
-                        y: [4500, 6500],
-                    },
-                    {
-                        x: 'Sales',
-                        y: [4100, 5600],
-                    },
-                ],
+                name: 'Exaone 3.5',
+                data: [31, 40, 28, 51, 42, 109, 200],
+            },
+            {
+                name: 'Llama 3.3',
+                data: [11, 32, 45, 32, 34, 52, 41],
             },
         ],
         options: {
+            title: {
+                text: '🦾 LLM Token Usage 🦾',
+                align: 'center',
+                style: {
+                    fontSize: '24px',
+                    fontWeight: 'bold',
+                    color: '#FFFFFF',
+                },
+            },
             chart: {
+                toolbar: {
+                    show: true,
+                    offsetX: 21,
+                    offsetY: 0,
+                },
                 foreColor: '#FFFFFF',
-                type: 'rangeBar',
+                height: 350,
+                type: 'area',
+                dropShadow: {
+                    enabled: true,
+                    color: '#FFFFFF',
+                    top: 0,
+                    left: 0,
+                    blur: 21,
+                    opacity: 0.7,
+                },
                 zoom: {
                     enabled: true,
                 },
             },
-            colors: ['#EC7D31', '#36BDCB'],
-            plotOptions: {
-                bar: {
-                    horizontal: true,
-                    isDumbbell: true,
-                    dumbbellColors: [['#EC7D31', '#36BDCB']],
-                },
+            colors: ['#69d2e7', '#FF4560'],
+            dataLabels: {
+                enabled: true,
             },
-            title: {
-                text: 'LLM Token Usage',
+            stroke: {
+                show: true,
+                curve: 'smooth',
+            },
+            xaxis: {
+                type: 'datetime',
+                categories: [
+                    '2018-09-19T00:00:00.000Z',
+                    '2018-09-19T01:30:00.000Z',
+                    '2018-09-19T02:30:00.000Z',
+                    '2018-09-19T03:30:00.000Z',
+                    '2018-09-19T04:30:00.000Z',
+                    '2018-09-19T05:30:00.000Z',
+                    '2018-09-19T06:30:00.000Z',
+                ],
             },
             legend: {
-                show: true,
-                showForSingleSeries: true,
                 position: 'top',
-                horizontalAlign: 'left',
-                customLegendItems: ['Female', 'Male'],
+                horizontalAlign: 'center',
+                offsetX: 0,
+                offsetY: -10,
+                customLegendItems: ['Exaone 3.5', 'Llama 3.3'],
             },
             fill: {
-                type: 'gradient',
-                gradient: {
-                    gradientToColors: ['#36BDCB'],
-                    inverseColors: false,
-                    stops: [0, 100],
-                },
+                type: 'solid',
+                opacity: 0.5,
             },
-            grid: {
-                xaxis: {
-                    lines: {
-                        show: true,
-                    },
-                },
-                yaxis: {
-                    lines: {
-                        show: false,
-                    },
-                },
+            tooltip: {
+                theme: 'dark',
+                // x: {
+                //   format: 'dd/MM/yy HH:mm'
+                //   }
             },
         },
     });
 
     return (
         <ReactApexChart
-            className="mx-8 mt-4"
+            className="mx-8 mt-6"
             options={state.options}
             series={state.series}
-            type="rangeBar"
+            type="area"
             height={height}
         />
     );
