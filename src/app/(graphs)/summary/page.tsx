@@ -41,6 +41,7 @@ export default function Summary({ height = 640 }: any) {
             },
         ],
         options: {
+            background: 'black',
             chart: {
                 toolbar: {
                     show: true,
