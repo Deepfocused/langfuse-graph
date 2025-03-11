@@ -9,6 +9,11 @@ const ReactApexChart = dynamic(() => import('react-apexcharts'), {
 }); // browser에서만 렌더링해야하므로 ssr을 끔
 
 /*
+agent내 멀티 llm별 호출 횟수 비교: 단일 질문에 대해, 특정 기간동안 각 역할을 하는 모델별로 부하 수준이 얼마나 다른지 보여주기
+- Column Chart 사용 
+*/
+
+/*
 GraphProps 대신 any를 써야하는 이유 
 Type error: Type 'OmitWithTag<GraphProps, keyof PageProps, "default">' does not satisfy the constraint '{ [x: string]: never; }'.
 Property 'height' is incompatible with index signature.
@@ -19,93 +24,84 @@ export default function Call({ height = 640 }: any) {
     const [state, setState] = useState<ChartProps>({
         series: [
             {
-                data: [
-                    {
-                        x: 'Operations',
-                        y: [2800, 4500],
-                    },
-                    {
-                        x: 'Customer Success',
-                        y: [3200, 4100],
-                    },
-                    {
-                        x: 'Engineering',
-                        y: [2950, 7800],
-                    },
-                    {
-                        x: 'Marketing',
-                        y: [3000, 4600],
-                    },
-                    {
-                        x: 'Product',
-                        y: [3500, 4100],
-                    },
-                    {
-                        x: 'Data Science',
-                        y: [4500, 6500],
-                    },
-                    {
-                        x: 'Sales',
-                        y: [4100, 5600],
-                    },
-                ],
+                name: 'Call',
+                data: [400, 430],
             },
         ],
         options: {
-            chart: {
-                foreColor: '#FFFFFF',
-                type: 'rangeBar',
-                zoom: {
-                    enabled: false,
+            title: {
+                text: '🍘 LLM Call Count 🍘',
+                align: 'center',
+                style: {
+                    fontSize: '24px',
+                    fontWeight: 'bold',
+                    color: '#FFFFFF',
                 },
             },
-            colors: ['#EC7D31', '#36BDCB'],
+            chart: {
+                toolbar: {
+                    show: true,
+                    offsetX: 21,
+                    offsetY: 0,
+                },
+                type: 'bar',
+                foreColor: '#FFFFFF',
+                dropShadow: {
+                    enabled: true,
+                    color: '#FFFFFF',
+                    top: 0,
+                    left: 0,
+                    blur: 21,
+                    opacity: 0.7,
+                },
+            },
+
             plotOptions: {
                 bar: {
+                    barHeight: '21%',
+                    distributed: true,
                     horizontal: true,
-                    isDumbbell: true,
-                    dumbbellColors: [['#EC7D31', '#36BDCB']],
+                    dataLabels: {
+                        position: 'center',
+                    },
                 },
             },
-            title: {
-                text: 'LLM Call Count',
+            colors: ['#69d2e7', '#FF4560'],
+            dataLabels: {
+                enabled: true,
+                // textAnchor: 'start',
+                style: {
+                    colors: ['#FFFFFF'],
+                },
             },
             legend: {
                 show: true,
                 showForSingleSeries: true,
-                position: 'top',
-                horizontalAlign: 'left',
-                customLegendItems: ['Female', 'Male'],
+                position: 'bottom',
+                horizontalAlign: 'center',
+                offsetX: 0,
+                offsetY: 0,
+                customLegendItems: ['Exaone 3.5', 'Llama 3.3'],
             },
             fill: {
-                type: 'gradient',
-                gradient: {
-                    gradientToColors: ['#36BDCB'],
-                    inverseColors: false,
-                    stops: [0, 100],
-                },
+                type: 'solid',
+                opacity: 1,
             },
-            grid: {
-                xaxis: {
-                    lines: {
-                        show: true,
-                    },
-                },
-                yaxis: {
-                    lines: {
-                        show: false,
-                    },
-                },
+            xaxis: {
+                categories: ['Exaone 3.5', 'LLama 3.3'],
+            },
+            tooltip: {
+                theme: 'dark',
             },
         },
     });
 
     return (
         <ReactApexChart
-            className="mx-8 mt-4"
+            className="mx-8 mt-6"
             options={state.options}
             series={state.series}
-            type="rangeBar"
+            type="bar"
             height={height}
         />
     );
