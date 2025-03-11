@@ -43,6 +43,7 @@ export default function Token({ height = 640 }: any) {
                 },
             },
             chart: {
+                background: 'black',
                 toolbar: {
                     show: true,
                     offsetX: 21,
