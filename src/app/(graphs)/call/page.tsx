@@ -39,6 +39,7 @@ export default function Call({ height = 640 }: any) {
                 },
             },
             chart: {
+                background: 'black',
                 toolbar: {
                     show: true,
                     offsetX: 21,
