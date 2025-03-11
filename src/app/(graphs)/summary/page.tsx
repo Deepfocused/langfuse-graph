@@ -9,6 +9,11 @@ const ReactApexChart = dynamic(() => import('react-apexcharts'), {
 }); // browser에서만 렌더링해야하므로 ssr을 끔
 
 /*
+summary table: 각 모델별 평균 latency, 입력 토큰 수, 출력 토큰 수, 단일 요청에 대한 호출 건수 보여주기
+- column 차트 사용하기 - 시간에 따른
+*/
+
+/*
 GraphProps 대신 any를 써야하는 이유 
 Type error: Type 'OmitWithTag<GraphProps, keyof PageProps, "default">' does not satisfy the constraint '{ [x: string]: never; }'.
 Property 'height' is incompatible with index signature.
@@ -16,31 +21,34 @@ Type 'any' is not assignable to type 'never'.
 */
 // 컴포넌트는 대문자
 export default function Summary({ height = 640 }: any) {
-    /* 필요 데이터 
-    전체 시간 구하기 - x 축
-    Y축은 모델명
-    각 LLM 별 구간 구하기(길이가 비중)
-    */
-
     const [state, setState] = useState<ChartProps>({
         series: [
             {
-                data: [
-                    {
-                        x: 'Exaone 3.5',
-                        y: [0, 1],
-                    },
-                    {
-                        x: 'Llama 3.3',
-                        y: [1, 2],
-                    },
-                ],
+                name: 'Latency',
+                data: [44, 55],
+            },
+            {
+                name: 'Input Token',
+                data: [76, 85],
+            },
+            {
+                name: 'Output Token',
+                data: [35, 41],
+            },
+            {
+                name: 'Call Count',
+                data: [35, 41],
             },
         ],
         options: {
             chart: {
+                toolbar: {
+                    show: true,
+                    offsetX: 21,
+                    offsetY: 0,
+                },
+                type: 'bar',
                 foreColor: '#FFFFFF',
-                type: 'rangeBar',
                 dropShadow: {
                     enabled: true,
                     color: '#fff',
@@ -49,64 +57,70 @@ export default function Summary({ height = 640 }: any) {
                     blur: 21,
                     opacity: 0.7,
                 },
-                zoom: {
-                    enabled: false,
-                },
             },
-            colors: ['#008FFB', '#FF4560'],
             plotOptions: {
                 bar: {
-                    horizontal: true,
-                    distributed: true,
-                    barHeight: '21%',
+                    horizontal: false,
+                    columnWidth: '70%',
+                    borderRadius: 2,
+                    borderRadiusApplication: 'end',
                 },
             },
             title: {
-                text: '🎢 LLM Inference Time 🎢',
+                text: '🔊 Summary 🔊',
                 align: 'center',
                 style: {
-                    fontSize: '20px',
+                    fontSize: '24px',
                     fontWeight: 'bold',
                     color: '#FFFFFF',
                 },
             },
+            dataLabels: {
+                enabled: true,
+            },
+            stroke: {
+                show: true,
+                width: 1,
+                curve: 'smooth',
+                colors: ['transparent'],
+            },
+            xaxis: {
+                categories: ['Exaone 3.5', 'Llama 3.3'],
+            },
             legend: {
                 show: true,
                 showForSingleSeries: true,
-                position: 'top',
-                horizontalAlign: 'left',
-                customLegendItems: ['Exaone 3.5', 'Llama 3.3'],
+                position: 'bottom',
+                horizontalAlign: 'center',
+                offsetX: 0,
+                offsetY: 0,
+                customLegendItems: [
+                    'Latency',
+                    'Input Token',
+                    'Output Token',
+                    'Call Count',
+                ],
             },
             fill: {
                 type: 'solid',
-                opacity: 0.7,
+                opacity: 1,
             },
-            xaxis: {
-                title: {
-                    text: '⏳ Time ⌛',
-                },
-            },
-            grid: {
-                xaxis: {
-                    lines: {
-                        show: true,
-                    },
-                },
-                yaxis: {
-                    lines: {
-                        show: false,
-                    },
-                },
+            // yaxis: {
+            //     title: {
+            //         text: '$ (thousands)',
+            //     },
+            // },
+            tooltip: {
+                theme: 'dark',
             },
         },
     });
-
     return (
         <ReactApexChart
-            className="mx-8 mt-4"
+            className="mx-8 mt-6"
             options={state.options}
             series={state.series}
-            type="rangeBar"
+            type="bar"
             height={height}
         />
     );
