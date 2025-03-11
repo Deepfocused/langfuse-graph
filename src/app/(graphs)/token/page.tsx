@@ -37,7 +37,7 @@ export default function Token({ height = 640 }: any) {
                 text: '🦾 LLM Token Usage 🦾',
                 align: 'center',
                 style: {
-                    fontSize: '24px',
+                    fontSize: '20px',
                     fontWeight: 'bold',
                     color: '#FFFFFF',
                 },
@@ -60,7 +60,7 @@ export default function Token({ height = 640 }: any) {
                     opacity: 0.7,
                 },
                 zoom: {
-                    enabled: true,
+                    enabled: false,
                 },
             },
             colors: ['#69d2e7', '#FF4560'],
