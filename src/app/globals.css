@@ -77,3 +77,9 @@ body {
     ); /* 슬라이더 배경색 */
     border-radius: 3px; /* 슬라이더 모서리 둥글게 처리 */
 }
+
+/* 햄버거 menu바에 강제로 스타일 주기 */
+.apexcharts-menu {
+    background-color: #000000 !important;
+    border-color: #ffffff !important;
+}

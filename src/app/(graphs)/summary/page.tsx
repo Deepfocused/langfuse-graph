@@ -20,7 +20,7 @@ Property 'height' is incompatible with index signature.
 Type 'any' is not assignable to type 'never'.
 */
 // 컴포넌트는 대문자
-export default function Summary({ height = 640 }: any) {
+export default function Summary({ height = 640, font_size = 28 }: any) {
     const [state, setState] = useState<ChartProps>({
         series: [
             {
@@ -41,8 +41,8 @@ export default function Summary({ height = 640 }: any) {
             },
         ],
         options: {
-            background: 'black',
             chart: {
+                background: 'black',
                 toolbar: {
                     show: true,
                     offsetX: 25,
@@ -71,22 +71,23 @@ export default function Summary({ height = 640 }: any) {
                 text: '🔊 Summary 🔊',
                 align: 'center',
                 style: {
-                    fontSize: '20px',
+                    fontSize: `${font_size}px`,
                     fontWeight: 'bold',
                     color: '#FFFFFF',
                 },
             },
             dataLabels: {
                 enabled: true,
+                style: {
+                    fontSize: '14px',
+                    colors: ['#FFFFFF'],
+                },
             },
             stroke: {
                 show: true,
                 width: 1,
                 curve: 'smooth',
                 colors: ['transparent'],
-            },
-            xaxis: {
-                categories: ['Exaone 3.5', 'Llama 3.3'],
             },
             legend: {
                 show: true,
@@ -95,6 +96,7 @@ export default function Summary({ height = 640 }: any) {
                 horizontalAlign: 'center',
                 offsetX: 0,
                 offsetY: 0,
+                fontSize: '16px',
                 customLegendItems: [
                     'Latency',
                     'Input Token',
@@ -106,11 +108,23 @@ export default function Summary({ height = 640 }: any) {
                 type: 'solid',
                 opacity: 1,
             },
-            // yaxis: {
-            //     title: {
-            //         text: '$ (thousands)',
-            //     },
-            // },
+            xaxis: {
+                categories: ['Exaone 3.5', 'Llama 3.3'],
+                labels: {
+                    show: true,
+                    style: {
+                        fontSize: '14px',
+                    },
+                },
+            },
+            yaxis: {
+                labels: {
+                    show: true,
+                    style: {
+                        fontSize: '14px',
+                    },
+                },
+            },
             tooltip: {
                 theme: 'dark',
             },
@@ -118,7 +132,7 @@ export default function Summary({ height = 640 }: any) {
     });
     return (
         <ReactApexChart
-            className="mx-8 mt-6"
+            className="mx-8 my-6"
             options={state.options}
             series={state.series}
             type="bar"

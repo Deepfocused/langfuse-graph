@@ -21,7 +21,7 @@ Property 'height' is incompatible with index signature.
 Type 'any' is not assignable to type 'never'.
 */
 // 컴포넌트는 대문자
-export default function Time({ height = 640 }: any) {
+export default function Time({ height = 640, font_size = 28 }: any) {
     const [state, setState] = useState<ChartProps>({
         series: [
             {
@@ -46,7 +46,7 @@ export default function Time({ height = 640 }: any) {
                 text: '🎢 LLM Inference Time 🎢',
                 align: 'center',
                 style: {
-                    fontSize: '20px',
+                    fontSize: `${font_size}px`,
                     fontWeight: 'bold',
                     color: '#FFFFFF',
                 },
@@ -83,6 +83,7 @@ export default function Time({ height = 640 }: any) {
             dataLabels: {
                 enabled: true,
                 style: {
+                    fontSize: '14px',
                     colors: ['#FFFFFF'],
                 },
             },
@@ -92,7 +93,8 @@ export default function Time({ height = 640 }: any) {
                 position: 'top',
                 horizontalAlign: 'center',
                 offsetX: 0,
-                offsetY: -10,
+                offsetY: 0,
+                fontSize: '16px',
                 customLegendItems: ['Exaone 3.5', 'Llama 3.3'],
             },
             fill: {
@@ -100,8 +102,26 @@ export default function Time({ height = 640 }: any) {
                 opacity: 1,
             },
             xaxis: {
+                labels: {
+                    show: true,
+                    style: {
+                        fontSize: '14px',
+                    },
+                },
                 title: {
                     text: '⏳ Time ⌛',
+                    offsetY: 10,
+                    style: {
+                        fontSize: '16px',
+                    },
+                },
+            },
+            yaxis: {
+                labels: {
+                    show: true,
+                    style: {
+                        fontSize: '14px',
+                    },
                 },
             },
             grid: {
@@ -140,7 +160,7 @@ export default function Time({ height = 640 }: any) {
 
     return (
         <ReactApexChart
-            className="mx-8 mt-6"
+            className="mx-8 my-6"
             options={state.options}
             series={state.series}
             type="rangeBar"

@@ -20,7 +20,7 @@ Property 'height' is incompatible with index signature.
 Type 'any' is not assignable to type 'never'.
 */
 // 컴포넌트는 대문자
-export default function Token({ height = 640 }: any) {
+export default function Token({ height = 640, font_size = 28 }: any) {
     const [state, setState] = useState<ChartProps>({
         series: [
             {
@@ -37,7 +37,7 @@ export default function Token({ height = 640 }: any) {
                 text: '🦾 LLM Token Usage 🦾',
                 align: 'center',
                 style: {
-                    fontSize: '20px',
+                    fontSize: `${font_size}px`,
                     fontWeight: 'bold',
                     color: '#FFFFFF',
                 },
@@ -67,12 +67,34 @@ export default function Token({ height = 640 }: any) {
             colors: ['#69d2e7', '#FF4560'],
             dataLabels: {
                 enabled: true,
+                style: {
+                    fontSize: '14px',
+                },
             },
             stroke: {
                 show: true,
                 curve: 'smooth',
             },
+            legend: {
+                position: 'top',
+                horizontalAlign: 'center',
+                offsetX: 0,
+                offsetY: 0,
+                fontSize: '16px',
+                customLegendItems: ['Exaone 3.5', 'Llama 3.3'],
+            },
+            fill: {
+                type: 'solid',
+                opacity: 0.5,
+            },
             xaxis: {
+                title: {
+                    text: '⏳ Time ⌛',
+                    offsetY: 10,
+                    style: {
+                        fontSize: '16px',
+                    },
+                },
                 type: 'datetime',
                 categories: [
                     '2018-09-19T00:00:00.000Z',
@@ -83,17 +105,20 @@ export default function Token({ height = 640 }: any) {
                     '2018-09-19T05:30:00.000Z',
                     '2018-09-19T06:30:00.000Z',
                 ],
+                labels: {
+                    show: true,
+                    style: {
+                        fontSize: '14px',
+                    },
+                },
             },
-            legend: {
-                position: 'top',
-                horizontalAlign: 'center',
-                offsetX: 0,
-                offsetY: -10,
-                customLegendItems: ['Exaone 3.5', 'Llama 3.3'],
-            },
-            fill: {
-                type: 'solid',
-                opacity: 0.5,
+            yaxis: {
+                labels: {
+                    show: true,
+                    style: {
+                        fontSize: '14px',
+                    },
+                },
             },
             tooltip: {
                 theme: 'dark',
@@ -106,7 +131,7 @@ export default function Token({ height = 640 }: any) {
 
     return (
         <ReactApexChart
-            className="mx-8 mt-6"
+            className="mx-8 my-6"
             options={state.options}
             series={state.series}
             type="area"
