@@ -46,7 +46,7 @@ export default function Time({ height = 640 }: any) {
                 text: '🎢 LLM Inference Time 🎢',
                 align: 'center',
                 style: {
-                    fontSize: '24px',
+                    fontSize: '20px',
                     fontWeight: 'bold',
                     color: '#FFFFFF',
                 },
