@@ -70,7 +70,7 @@ export default function Summary({ height = 640 }: any) {
                 text: '🔊 Summary 🔊',
                 align: 'center',
                 style: {
-                    fontSize: '24px',
+                    fontSize: '20px',
                     fontWeight: 'bold',
                     color: '#FFFFFF',
                 },
