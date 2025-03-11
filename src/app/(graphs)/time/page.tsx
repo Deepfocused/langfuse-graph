@@ -52,6 +52,7 @@ export default function Time({ height = 640 }: any) {
                 },
             },
             chart: {
+                background: 'black',
                 toolbar: {
                     show: true,
                     offsetX: 21,
