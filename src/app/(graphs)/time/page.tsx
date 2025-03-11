@@ -55,7 +55,7 @@ export default function Time({ height = 640 }: any) {
                 background: 'black',
                 toolbar: {
                     show: true,
-                    offsetX: 21,
+                    offsetX: 25,
                     offsetY: 0,
                 },
                 type: 'rangeBar',
