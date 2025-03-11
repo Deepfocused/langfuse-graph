@@ -33,7 +33,7 @@ export default function Call({ height = 640 }: any) {
                 text: '🍘 LLM Call Count 🍘',
                 align: 'center',
                 style: {
-                    fontSize: '24px',
+                    fontSize: '20px',
                     fontWeight: 'bold',
                     color: '#FFFFFF',
                 },
