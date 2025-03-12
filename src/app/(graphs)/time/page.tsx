@@ -157,6 +157,8 @@ export default function Time({
                     ? `/langfuse/time?traceId=${id}`
                     : '/langfuse/time';
                 const response = await fetch(url);
+                // 예외 처리 필요
+
                 const result = await response.json();
 
                 setState((prevState) => ({
