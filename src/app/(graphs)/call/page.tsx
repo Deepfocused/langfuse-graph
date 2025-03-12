@@ -107,7 +107,7 @@ export default function Call({
     traceId = '',
 }: GraphProps) {
     const [state, setState] = useState<ChartProps>({
-        series: [{ name: 'Call', data: [1, 1] }],
+        series: [{ name: 'Call', data: [3, 1] }],
         options: defaultChartOptions(fontSize),
     });
 
@@ -124,6 +124,8 @@ export default function Call({
                     ? `/langfuse/call?traceId=${id}`
                     : '/langfuse/call';
                 const response = await fetch(url);
+                // 예외 처리 필요
+
                 const data: Array<number> = Object.values(
                     await response.json(),
                 );
