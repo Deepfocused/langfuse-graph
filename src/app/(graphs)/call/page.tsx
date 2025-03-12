@@ -1,17 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import type { GraphProps, ChartProps } from '@/types/chart_types';
+import type { ChartProps } from '@/types/chart_types';
 // nextjs default로 서버사이드 렌더링을 함
 import dynamic from 'next/dynamic';
 const ReactApexChart = dynamic(() => import('react-apexcharts'), {
     ssr: false,
 }); // browser에서만 렌더링해야하므로 ssr을 끔
-
-/*
-agent내 멀티 llm별 호출 횟수 비교: 단일 질문에 대해, 특정 기간동안 각 역할을 하는 모델별로 부하 수준이 얼마나 다른지 보여주기
-- Column Chart 사용 
-*/
 
 /*
 GraphProps 대신 any를 써야하는 이유 
@@ -20,7 +15,11 @@ Property 'height' is incompatible with index signature.
 Type 'any' is not assignable to type 'never'.
 */
 // 컴포넌트는 대문자
-export default function Call({ height = 640, font_size = 28 }: any) {
+export default function Call({
+    height = 640,
+    fontSize = 28,
+    traceId = '',
+}: any) {
     const [state, setState] = useState<ChartProps>({
         series: [
             {
@@ -33,7 +32,7 @@ export default function Call({ height = 640, font_size = 28 }: any) {
                 text: '🍘 LLM Call Count 🍘',
                 align: 'center',
                 style: {
-                    fontSize: `${font_size}px`,
+                    fontSize: `${fontSize}px`,
                     fontWeight: 'bold',
                     color: '#FFFFFF',
                 },
@@ -70,7 +69,6 @@ export default function Call({ height = 640, font_size = 28 }: any) {
             colors: ['#69d2e7', '#FF4560'],
             dataLabels: {
                 enabled: true,
-                // textAnchor: 'start',
                 style: {
                     fontSize: '14px',
                     colors: ['#FFFFFF'],
@@ -84,14 +82,14 @@ export default function Call({ height = 640, font_size = 28 }: any) {
                 offsetX: 0,
                 offsetY: 0,
                 fontSize: '16px',
-                customLegendItems: ['Exaone 3.5', 'Llama 3.3'],
+                customLegendItems: ['Claude-3.5', 'Llama 3.3'],
             },
             fill: {
                 type: 'solid',
                 opacity: 1,
             },
             xaxis: {
-                categories: ['Exaone 3.5', 'LLama 3.3'],
+                categories: ['Claude-3.5', 'LLama 3.3'],
                 labels: {
                     show: true,
                     style: {
@@ -112,6 +110,32 @@ export default function Call({ height = 640, font_size = 28 }: any) {
             },
         },
     });
+
+    const [id, setId] = useState<string>(traceId);
+
+    useEffect(() => {
+        setId(traceId);
+    }, [traceId]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                let url = '/langfuse/call';
+                if (id) {
+                    url += `?traceId=${id}`;
+                }
+                const response = await fetch(url); // ex) ?traceId=e1b1b1b1-1b1b-1b1b-1b1b-1b1b1b1b1b1b(인자로 받기)
+                const result = await response.json();
+
+                setState((prevState) => ({
+                    ...prevState,
+                }));
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+        fetchData();
+    }, [id]);
 
     return (
         <ReactApexChart
