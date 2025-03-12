@@ -18,6 +18,8 @@ Type 'any' is not assignable to type 'never'.
 export default function Call({
     height = 640,
     fontSize = 28,
+    name = '',
+    userId = '',
     traceId = '',
 }: any) {
     const [state, setState] = useState<ChartProps>({
