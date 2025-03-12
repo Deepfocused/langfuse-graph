@@ -7,7 +7,7 @@ import { Langfuse } from 'langfuse';
 const langfuse = new Langfuse({
     publicKey: process.env.LANGFUSE_PUBLIC_KEY || '',
     secretKey: process.env.LANGFUSE_SECRET_KEY || '',
-    baseUrl: process.env.LANGFUSE_BASE_URL,
+    baseUrl: process.env.LANGFUSE_BASE_URL || '',
 });
 
 const options: Intl.DateTimeFormatOptions = {
@@ -27,7 +27,7 @@ export async function GET(
     request: NextRequest,
     { params }: { params: Promise<{ slug: string }> },
 ) {
-    const pathName: string = request.nextUrl.pathname;
+    // const pathName: string = request.nextUrl.pathname;
     const searchParams: URLSearchParams = request.nextUrl.searchParams;
 
     // query로 받아서 페이지마다 표시할 수 있도록 함. -> 프론트 코드에서 호출하는 부분 수정 필요
