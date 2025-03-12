@@ -128,15 +128,15 @@ export default function Time({
                 data: [
                     {
                         x: 'Claude-3.5',
-                        y: [0, 0.5],
+                        y: [0, 0],
                     },
                     {
                         x: 'Llama 3.3',
-                        y: [1, 3],
+                        y: [0, 0],
                     },
                     {
                         x: 'All time',
-                        y: [0, 4],
+                        y: [0, 0],
                     },
                 ],
             },
@@ -163,14 +163,14 @@ export default function Time({
 
                 setState((prevState) => ({
                     ...prevState,
-                    series: [
-                        {
-                            data: result.map((item: any) => ({
-                                x: item.model,
-                                y: [item.startTime, item.endTime],
-                            })),
-                        },
-                    ],
+                    // series: [
+                    //     {
+                    //         data: result.map((item: any) => ({
+                    //             x: item.model,
+                    //             y: [item.startTime, item.endTime],
+                    //         })),
+                    //     },
+                    // ],
                 }));
             } catch (error) {
                 console.error('Error fetching data:', error);
