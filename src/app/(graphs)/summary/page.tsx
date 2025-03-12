@@ -9,6 +9,15 @@ const ReactApexChart = dynamic(() => import('react-apexcharts'), {
 }); // browser에서만 렌더링해야하므로 ssr을 끔
 
 const defaultChartOptions = (fontSize: number) => ({
+    title: {
+        text: '🍘 LLM Call Count 🍘',
+        align: 'center',
+        style: {
+            fontSize: `${fontSize}px`,
+            fontWeight: 'bold',
+            color: '#FFFFFF',
+        },
+    },
     chart: {
         background: 'black',
         toolbar: {
@@ -16,11 +25,11 @@ const defaultChartOptions = (fontSize: number) => ({
             offsetX: 25,
             offsetY: 0,
         },
-        type: 'bar',
+        type: 'bar' as 'bar',
         foreColor: '#FFFFFF',
         dropShadow: {
             enabled: true,
-            color: '#fff',
+            color: '#FFFFFF',
             top: 0,
             left: 0,
             blur: 21,
@@ -29,33 +38,21 @@ const defaultChartOptions = (fontSize: number) => ({
     },
     plotOptions: {
         bar: {
-            horizontal: false,
-            columnWidth: '70%',
-            borderRadius: 2,
-            borderRadiusApplication: 'end',
+            barHeight: '21%',
+            distributed: true,
+            horizontal: true,
+            dataLabels: {
+                position: 'center',
+            },
         },
     },
-    title: {
-        text: '🔊 Summary 🔊',
-        align: 'center',
-        style: {
-            fontSize: `${fontSize}px`,
-            fontWeight: 'bold',
-            color: '#FFFFFF',
-        },
-    },
+    colors: ['#69d2e7', '#FF4560'],
     dataLabels: {
         enabled: true,
         style: {
             fontSize: '14px',
             colors: ['#FFFFFF'],
         },
-    },
-    stroke: {
-        show: true,
-        width: 1,
-        curve: 'smooth',
-        colors: ['transparent'],
     },
     legend: {
         show: true,
@@ -65,24 +62,21 @@ const defaultChartOptions = (fontSize: number) => ({
         offsetX: 0,
         offsetY: 0,
         fontSize: '16px',
-        customLegendItems: [
-            'Latency',
-            'Input Token',
-            'Output Token',
-            'Call Count',
-        ],
+        customLegendItems: ['Claude-3.5', 'Llama 3.3'],
     },
     fill: {
         type: 'solid',
         opacity: 1,
     },
     xaxis: {
-        categories: ['Claude-3.5', 'Llama 3.3'],
+        stepSize: 1,
+        categories: ['Claude-3.5', 'LLama 3.3'],
         labels: {
             show: true,
             style: {
                 fontSize: '14px',
             },
+            formatter: (val: number): number => Math.round(val),
         },
     },
     yaxis: {
@@ -105,7 +99,7 @@ Property 'height' is incompatible with index signature.
 Type 'any' is not assignable to type 'never'.
 */
 // 컴포넌트는 대문자
-export default function Summary({
+export default function Call({
     height = 640,
     fontSize = 28,
     name = '',
@@ -113,11 +107,7 @@ export default function Summary({
     traceId = '',
 }: GraphProps) {
     const [state, setState] = useState<ChartProps>({
-        series: [
-            { name: 'Latency(ms)', data: [0, 0] },
-            { name: 'Input Token', data: [0, 0] },
-            { name: 'Output Token', data: [0, 0] },
-        ],
+        series: [{ name: 'Call', data: [0, 0] }],
         options: defaultChartOptions(fontSize),
     });
 
@@ -131,27 +121,25 @@ export default function Summary({
         const fetchData = async () => {
             try {
                 const url = id
-                    ? `/langfuse/summary?traceId=${id}`
-                    : '/langfuse/summary';
+                    ? `/langfuse/call?traceId=${id}`
+                    : '/langfuse/call';
                 const response = await fetch(url);
                 // 예외 처리 필요
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
 
-                const result = await response.json();
-
-                const data: Array<Array<number>> = Object.values(result);
-
-                // ex) [[1,2,3,4], [2,3,4,5]] => [[1,2], [2,3], [3,4], [4,5]]
-                const processedData: Array<Array<number>> = data[0].map(
-                    (_, index) => data.map((array) => array[index]),
-                );
+                let result;
+                try {
+                    result = await response.json();
+                } catch (jsonError) {
+                    throw new Error('Failed to parse JSON');
+                }
+                const data: Array<number> = Object.values(result);
 
                 setState((prevState) => ({
                     ...prevState,
-                    series: [
-                        { name: 'Latency(s)', data: processedData[0] },
-                        { name: 'Input Token', data: processedData[1] },
-                        { name: 'Output Token', data: processedData[2] },
-                    ],
+                    series: [{ name: 'Call', data }],
                 }));
             } catch (error) {
                 console.error('Error fetching data:', error);
