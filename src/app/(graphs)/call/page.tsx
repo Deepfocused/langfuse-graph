@@ -107,7 +107,7 @@ export default function Call({
     traceId = '',
 }: GraphProps) {
     const [state, setState] = useState<ChartProps>({
-        series: [{ name: 'Call', data: [3, 1] }],
+        series: [{ name: 'Call', data: [0, 0] }],
         options: defaultChartOptions(fontSize),
     });
 
