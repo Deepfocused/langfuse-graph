@@ -139,11 +139,12 @@ export default function Summary({
                 const result = await response.json();
 
                 const data: Array<Array<number>> = Object.values(result);
+
+                // ex) [[1,2,3,4], [2,3,4,5]] => [[1,2], [2,3], [3,4], [4,5]]
                 const processedData: Array<Array<number>> = data[0].map(
                     (_, index) => data.map((array) => array[index]),
                 );
 
-                console.log(processedData);
                 setState((prevState) => ({
                     ...prevState,
                     series: [
