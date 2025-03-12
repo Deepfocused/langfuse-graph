@@ -158,8 +158,15 @@ export default function Time({
                     : '/langfuse/time';
                 const response = await fetch(url);
                 // 예외 처리 필요
-
-                const result = await response.json();
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                let result;
+                try {
+                    result = await response.json();
+                } catch (jsonError) {
+                    throw new Error('Failed to parse JSON');
+                }
 
                 setState((prevState) => ({
                     ...prevState,
