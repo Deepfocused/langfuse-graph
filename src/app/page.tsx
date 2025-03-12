@@ -9,7 +9,7 @@ import { motion } from 'framer-motion';
 
 export default function Home() {
     const height = 300;
-    const font_size = 20;
+    const fontSize = 20;
     return (
         <>
             <div className="mt-2 mx-4 grid gap-6 md:grid-cols-2">
@@ -28,7 +28,7 @@ export default function Home() {
                         scroll={false}
                         prefetch={true}
                     >
-                        <Time height={height} font_size={font_size} />
+                        <Time height={height} fontSize={fontSize} />
                     </Link>
                 </motion.div>
                 <motion.div
@@ -46,7 +46,7 @@ export default function Home() {
                         scroll={false}
                         prefetch={true}
                     >
-                        <Token height={height} font_size={font_size} />
+                        <Token height={height} fontSize={fontSize} />
                     </Link>
                 </motion.div>
             </div>
@@ -66,7 +66,7 @@ export default function Home() {
                         scroll={false}
                         prefetch={true}
                     >
-                        <Call height={height} font_size={font_size} />
+                        <Call height={height} fontSize={fontSize} />
                     </Link>
                 </motion.div>
                 <motion.div
@@ -84,7 +84,7 @@ export default function Home() {
                         scroll={false}
                         prefetch={true}
                     >
-                        <Summary height={height} font_size={font_size} />
+                        <Summary height={height} fontSize={fontSize} />
                     </Link>
                 </motion.div>
             </div>
