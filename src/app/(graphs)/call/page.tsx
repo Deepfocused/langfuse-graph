@@ -125,10 +125,17 @@ export default function Call({
                     : '/langfuse/call';
                 const response = await fetch(url);
                 // 예외 처리 필요
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
 
-                const data: Array<number> = Object.values(
-                    await response.json(),
-                );
+                let result;
+                try {
+                    result = await response.json();
+                } catch (jsonError) {
+                    throw new Error('Failed to parse JSON');
+                }
+                const data: Array<number> = Object.values(result);
 
                 setState((prevState) => ({
                     ...prevState,
