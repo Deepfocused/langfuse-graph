@@ -147,7 +147,7 @@ export default function Summary({
                 setState((prevState) => ({
                     ...prevState,
                     series: [
-                        { name: 'Latency(ms)', data: processedData[0] },
+                        { name: 'Latency(s)', data: processedData[0] },
                         { name: 'Input Token', data: processedData[1] },
                         { name: 'Output Token', data: processedData[2] },
                     ],
