@@ -1,9 +1,13 @@
 import { ApexOptions } from 'apexcharts';
 
 // 사용 x
-// export interface GraphProps {
-//     height?: number;
-// }
+export interface GraphProps {
+    height?: number;
+    fontSize?: number;
+    name?: string;
+    userId?: string;
+    traceId?: string;
+}
 export interface ChartProps {
     series: ApexOptions['series'];
     options: ApexOptions;
