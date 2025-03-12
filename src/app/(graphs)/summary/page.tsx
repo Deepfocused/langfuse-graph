@@ -8,13 +8,6 @@ const ReactApexChart = dynamic(() => import('react-apexcharts'), {
     ssr: false,
 }); // browser에서만 렌더링해야하므로 ssr을 끔
 
-/*
-GraphProps 대신 any를 써야하는 이유 
-Type error: Type 'OmitWithTag<GraphProps, keyof PageProps, "default">' does not satisfy the constraint '{ [x: string]: never; }'.
-Property 'height' is incompatible with index signature.
-Type 'any' is not assignable to type 'never'.
-*/
-// 컴포넌트는 대문자
 const defaultChartOptions = (fontSize: number) => ({
     chart: {
         background: 'black',
@@ -105,6 +98,13 @@ const defaultChartOptions = (fontSize: number) => ({
     },
 });
 
+/*
+GraphProps 대신 any를 써야하는 이유 
+Type error: Type 'OmitWithTag<GraphProps, keyof PageProps, "default">' does not satisfy the constraint '{ [x: string]: never; }'.
+Property 'height' is incompatible with index signature.
+Type 'any' is not assignable to type 'never'.
+*/
+// 컴포넌트는 대문자
 export default function Summary({
     height = 640,
     fontSize = 28,
