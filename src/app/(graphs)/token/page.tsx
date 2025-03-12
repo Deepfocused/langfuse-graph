@@ -15,33 +15,27 @@ Property 'height' is incompatible with index signature.
 Type 'any' is not assignable to type 'never'.
 */
 // 컴포넌트는 대문자
-export default function Time({
+export default function Token({
     height = 640,
     fontSize = 28,
+    name = '',
+    userId = '',
     traceId = '',
 }: any) {
     const [state, setState] = useState<ChartProps>({
         series: [
             {
-                data: [
-                    {
-                        x: 'Claude-3.5',
-                        y: [0, 0.5],
-                    },
-                    {
-                        x: 'Llama 3.3',
-                        y: [1, 3],
-                    },
-                    {
-                        x: 'All time',
-                        y: [0, 4],
-                    },
-                ],
+                name: 'Claude-3.5',
+                data: [31, 40, 28, 51, 42, 109, 200],
+            },
+            {
+                name: 'Llama 3.3',
+                data: [11, 32, 45, 32, 34, 52, 41],
             },
         ],
         options: {
             title: {
-                text: '🎢 LLM Inference Time 🎢',
+                text: '🦾 LLM Token Usage 🦾',
                 align: 'center',
                 style: {
                     fontSize: `${fontSize}px`,
@@ -56,8 +50,9 @@ export default function Time({
                     offsetX: 25,
                     offsetY: 0,
                 },
-                type: 'rangeBar',
                 foreColor: '#FFFFFF',
+                height: 350,
+                type: 'area',
                 dropShadow: {
                     enabled: true,
                     color: '#FFFFFF',
@@ -70,24 +65,18 @@ export default function Time({
                     enabled: false,
                 },
             },
-            colors: ['#69d2e7', '#FF4560', '#AB45C0'],
-            plotOptions: {
-                bar: {
-                    horizontal: true,
-                    distributed: true,
-                    barHeight: '30%',
-                },
-            },
+            colors: ['#69d2e7', '#FF4560'],
             dataLabels: {
                 enabled: true,
                 style: {
                     fontSize: '14px',
-                    colors: ['#FFFFFF'],
                 },
             },
-            legend: {
+            stroke: {
                 show: true,
-                showForSingleSeries: true,
+                curve: 'smooth',
+            },
+            legend: {
                 position: 'top',
                 horizontalAlign: 'center',
                 offsetX: 0,
@@ -97,20 +86,22 @@ export default function Time({
             },
             fill: {
                 type: 'solid',
-                opacity: 1,
+                opacity: 0.5,
             },
             xaxis: {
-                labels: {
-                    show: true,
-                    style: {
-                        fontSize: '14px',
-                    },
-                },
                 title: {
                     text: '⏳ Time ⌛',
                     offsetY: 10,
                     style: {
                         fontSize: '16px',
+                    },
+                },
+                // type: 'datetime',
+                categories: ['0', '8', '2', '3', '3', '4', '5'],
+                labels: {
+                    show: true,
+                    style: {
+                        fontSize: '14px',
                     },
                 },
             },
@@ -122,20 +113,11 @@ export default function Time({
                     },
                 },
             },
-            grid: {
-                xaxis: {
-                    lines: {
-                        show: true,
-                    },
-                },
-                yaxis: {
-                    lines: {
-                        show: false,
-                    },
-                },
-            },
             tooltip: {
                 theme: 'dark',
+                // x: {
+                //   format: 'dd/MM/yy HH:mm'
+                //   }
             },
         },
     });
@@ -149,13 +131,11 @@ export default function Time({
     useEffect(() => {
         const fetchData = async () => {
             try {
-                let url = '/langfuse/time';
-                if (id) {
-                    url += `?traceId=${id}`;
-                }
+                const url = id
+                    ? `/langfuse/token?traceId=${id}`
+                    : '/langfuse/token';
                 const response = await fetch(url); // ex) ?traceId=e1b1b1b1-1b1b-1b1b-1b1b-1b1b1b1b1b1b(인자로 받기)
                 const result = await response.json();
-
                 setState((prevState) => ({
                     ...prevState,
                 }));
@@ -171,7 +151,7 @@ export default function Time({
             className="mx-8 my-6"
             options={state.options}
             series={state.series}
-            type="rangeBar"
+            type="area"
             height={height}
         />
     );
