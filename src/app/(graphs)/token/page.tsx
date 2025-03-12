@@ -1,17 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import type { GraphProps, ChartProps } from '@/types/chart_types';
+import type { ChartProps } from '@/types/chart_types';
 // nextjs default로 서버사이드 렌더링을 함
 import dynamic from 'next/dynamic';
 const ReactApexChart = dynamic(() => import('react-apexcharts'), {
     ssr: false,
 }); // browser에서만 렌더링해야하므로 ssr을 끔
-
-/*
-agent내 멀티 llm별 입출력 토큰 사용량 비교 뷰: 각 역할을 하는 llm별로 토큰 사용량이 많이 다름을 보여주기
-- Column Chart 사용 - 시간에 따른
-*/
 
 /*
 GraphProps 대신 any를 써야하는 이유 
@@ -20,24 +15,36 @@ Property 'height' is incompatible with index signature.
 Type 'any' is not assignable to type 'never'.
 */
 // 컴포넌트는 대문자
-export default function Token({ height = 640, font_size = 28 }: any) {
+export default function Time({
+    height = 640,
+    fontSize = 28,
+    traceId = '',
+}: any) {
     const [state, setState] = useState<ChartProps>({
         series: [
             {
-                name: 'Exaone 3.5',
-                data: [31, 40, 28, 51, 42, 109, 200],
-            },
-            {
-                name: 'Llama 3.3',
-                data: [11, 32, 45, 32, 34, 52, 41],
+                data: [
+                    {
+                        x: 'Claude-3.5',
+                        y: [0, 0.5],
+                    },
+                    {
+                        x: 'Llama 3.3',
+                        y: [1, 3],
+                    },
+                    {
+                        x: 'All time',
+                        y: [0, 4],
+                    },
+                ],
             },
         ],
         options: {
             title: {
-                text: '🦾 LLM Token Usage 🦾',
+                text: '🎢 LLM Inference Time 🎢',
                 align: 'center',
                 style: {
-                    fontSize: `${font_size}px`,
+                    fontSize: `${fontSize}px`,
                     fontWeight: 'bold',
                     color: '#FFFFFF',
                 },
@@ -49,9 +56,8 @@ export default function Token({ height = 640, font_size = 28 }: any) {
                     offsetX: 25,
                     offsetY: 0,
                 },
+                type: 'rangeBar',
                 foreColor: '#FFFFFF',
-                height: 350,
-                type: 'area',
                 dropShadow: {
                     enabled: true,
                     color: '#FFFFFF',
@@ -64,51 +70,47 @@ export default function Token({ height = 640, font_size = 28 }: any) {
                     enabled: false,
                 },
             },
-            colors: ['#69d2e7', '#FF4560'],
+            colors: ['#69d2e7', '#FF4560', '#AB45C0'],
+            plotOptions: {
+                bar: {
+                    horizontal: true,
+                    distributed: true,
+                    barHeight: '30%',
+                },
+            },
             dataLabels: {
                 enabled: true,
                 style: {
                     fontSize: '14px',
+                    colors: ['#FFFFFF'],
                 },
             },
-            stroke: {
-                show: true,
-                curve: 'smooth',
-            },
             legend: {
+                show: true,
+                showForSingleSeries: true,
                 position: 'top',
                 horizontalAlign: 'center',
                 offsetX: 0,
                 offsetY: 0,
                 fontSize: '16px',
-                customLegendItems: ['Exaone 3.5', 'Llama 3.3'],
+                customLegendItems: ['Claude-3.5', 'Llama 3.3'],
             },
             fill: {
                 type: 'solid',
-                opacity: 0.5,
+                opacity: 1,
             },
             xaxis: {
+                labels: {
+                    show: true,
+                    style: {
+                        fontSize: '14px',
+                    },
+                },
                 title: {
                     text: '⏳ Time ⌛',
                     offsetY: 10,
                     style: {
                         fontSize: '16px',
-                    },
-                },
-                // type: 'datetime',
-                categories: [
-                    '0',
-                    '1',
-                    '2',
-                    '3',
-                    '3',
-                    '4',
-                    '5',
-                ],
-                labels: {
-                    show: true,
-                    style: {
-                        fontSize: '14px',
                     },
                 },
             },
@@ -120,21 +122,56 @@ export default function Token({ height = 640, font_size = 28 }: any) {
                     },
                 },
             },
+            grid: {
+                xaxis: {
+                    lines: {
+                        show: true,
+                    },
+                },
+                yaxis: {
+                    lines: {
+                        show: false,
+                    },
+                },
+            },
             tooltip: {
                 theme: 'dark',
-                // x: {
-                //   format: 'dd/MM/yy HH:mm'
-                //   }
             },
         },
     });
+
+    const [id, setId] = useState<string>(traceId);
+
+    useEffect(() => {
+        setId(traceId);
+    }, [traceId]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                let url = '/langfuse/time';
+                if (id) {
+                    url += `?traceId=${id}`;
+                }
+                const response = await fetch(url); // ex) ?traceId=e1b1b1b1-1b1b-1b1b-1b1b-1b1b1b1b1b1b(인자로 받기)
+                const result = await response.json();
+
+                setState((prevState) => ({
+                    ...prevState,
+                }));
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+        fetchData();
+    }, [id]);
 
     return (
         <ReactApexChart
             className="mx-8 my-6"
             options={state.options}
             series={state.series}
-            type="area"
+            type="rangeBar"
             height={height}
         />
     );
