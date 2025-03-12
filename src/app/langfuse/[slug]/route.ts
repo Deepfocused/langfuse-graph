@@ -3,6 +3,7 @@
 // https://nextjs.org/docs/app/api-reference/file-conventions/route
 import { type NextRequest, NextResponse } from 'next/server';
 import { Langfuse } from 'langfuse';
+import type { LlmCallCountData } from '@/types/chart_types';
 
 const langfuse = new Langfuse({
     publicKey: process.env.LANGFUSE_PUBLIC_KEY || '',
@@ -30,10 +31,32 @@ export async function GET(
     // const pathName: string = request.nextUrl.pathname;
     const searchParams: URLSearchParams = request.nextUrl.searchParams;
 
-    // query로 받아서 페이지마다 표시할 수 있도록 함. -> 프론트 코드에서 호출하는 부분 수정 필요
+    /* 
+        query로 받아서 페이지마다 표시할 수 있도록 함.
+
+        🔰❗to do❗🔰
+        -> 프론트에서 UI로 받아서 처리할 수 있도록 해야함
+        -> 프론트에서도 langfuse api 사용해야함
+    */
     const name: string = searchParams.get('name') || 'RUNE';
     const userId: string = searchParams.get('userId') || 'woongsik';
     const specificTraceId: string | null = searchParams.get('traceId');
+
+    // 그래프 표시를 위해 필요한 변수들
+    // 💥 모델 추가되면 수정해야 함.💥
+    const llmModel: Array<string> = ['claude-3-5-sonnet-20241022', 'llama3.3'];
+    let [allLatency, startTime, endTime]: [number, string, string] = [
+        0,
+        '',
+        '',
+    ];
+    const llmLatency: [Array<number>, Array<number>] = [[], []];
+    // const llmTime: [Array<string>, Array<string>] = [[], []];
+
+    const llmInputTokenCount: [Array<number>, Array<number>] = [[], []];
+    const llmOutputTokenCount: [Array<number>, Array<number>] = [[], []];
+    const llmToktalTokenCount: [Array<number>, Array<number>] = [[], []];
+    let llmCallCount: [number, number] = [0, 0];
 
     // https://js.reference.langfuse.com/classes/langfuse.Langfuse.html api 참고하여 작성
     try {
@@ -57,33 +80,17 @@ export async function GET(
             );
         }
 
-        const traceId = traceSelected.id;
-        const Observations = (
+        allLatency = traceSelected.latency;
+        startTime = formatTime(traceSelected.createdAt);
+        endTime = formatTime(traceSelected.updatedAt);
+
+        const traceId: string = traceSelected.id;
+        const Observations: any = (
             await langfuse.fetchObservations({
                 userId,
                 traceId,
             })
         ).data;
-
-        // 그래프 표시를 위해 필요한 변수들
-        const allLatency = traceSelected.latency;
-        const startTime = formatTime(traceSelected.createdAt);
-        const endTime = formatTime(traceSelected.updatedAt);
-
-        // 💥 모델 추가되면 수정해야 함.💥
-        const llmModel: Array<string> = [
-            'claude-3-5-sonnet-20241022',
-            'llama3.3',
-        ];
-
-        const llmLatency: [Array<number>, Array<number>] = [[], []];
-        // const llmTime: [Array<string>, Array<string>] = [[], []];
-
-        const llmInputTokenCount: [Array<number>, Array<number>] = [[], []];
-        const llmOutputTokenCount: [Array<number>, Array<number>] = [[], []];
-        const llmToktalTokenCount: [Array<number>, Array<number>] = [[], []];
-
-        let llmCallCount: [number, number] = [0, 0];
 
         // 가장 최근에 실행된 것 부터 출력됨
         for (const Observation of Observations) {
@@ -103,16 +110,14 @@ export async function GET(
                     llmOutputTokenCount[1].push(Observation.completionTokens);
                     llmToktalTokenCount[1].push(Observation.totalTokens);
                     llmCallCount[1] += 1;
-                    // console.log("Observation: ", Observation);
+                    // console.log('Observation: ', Observation);
                 } else {
-                    console.log('Model not supported yet');
                 }
         }
         console.log(llmLatency);
         console.log(llmInputTokenCount);
         console.log(llmOutputTokenCount);
         console.log(llmToktalTokenCount);
-        console.log(llmCallCount);
     } catch (error) {
         console.error('Error fetching trace data:', error);
         return NextResponse.json(
@@ -127,7 +132,7 @@ export async function GET(
             return NextResponse.json({ data: 'time' }, { status: 200 });
         } catch (error) {
             return NextResponse.json(
-                { error: 'Failed to fetch trace timing data' },
+                { error: 'Failed to fetch trace time data' },
                 { status: 500 },
             );
         }
@@ -142,7 +147,15 @@ export async function GET(
         }
     } else if (slug === 'call') {
         try {
-            return NextResponse.json({ data: 'call' }, { status: 200 });
+            // result 가 객체!
+            const llmCallCountData = llmModel.reduce<LlmCallCountData>(
+                (result: LlmCallCountData, name: string, index: number) => {
+                    result[name] = llmCallCount[index];
+                    return result;
+                },
+                {},
+            );
+            return NextResponse.json(llmCallCountData, { status: 200 });
         } catch (error) {
             return NextResponse.json(
                 { error: 'Failed to fetch trace call data' },
@@ -154,7 +167,7 @@ export async function GET(
             return NextResponse.json({ data: 'summary' }, { status: 200 });
         } catch (error) {
             return NextResponse.json(
-                { error: 'Failed to fetch trace call data' },
+                { error: 'Failed to fetch trace summary data' },
                 { status: 500 },
             );
         }
