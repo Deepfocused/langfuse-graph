@@ -24,7 +24,7 @@ export default function Call({
         series: [
             {
                 name: 'Call',
-                data: [400, 430],
+                data: [1, 1],
             },
         ],
         options: {
@@ -89,11 +89,15 @@ export default function Call({
                 opacity: 1,
             },
             xaxis: {
+                stepSize: 1,
                 categories: ['Claude-3.5', 'LLama 3.3'],
                 labels: {
                     show: true,
                     style: {
                         fontSize: '14px',
+                    },
+                    formatter: (val: number): number => {
+                        return Math.round(val);
                     },
                 },
             },
@@ -120,15 +124,22 @@ export default function Call({
     useEffect(() => {
         const fetchData = async () => {
             try {
-                let url = '/langfuse/call';
-                if (id) {
-                    url += `?traceId=${id}`;
-                }
+                const url = id
+                    ? `/langfuse/call?traceId=${id}`
+                    : '/langfuse/call';
                 const response = await fetch(url); // ex) ?traceId=e1b1b1b1-1b1b-1b1b-1b1b-1b1b1b1b1b1b(인자로 받기)
-                const result = await response.json();
+                const data: Array<number> = Object.values(
+                    await response.json(),
+                );
 
                 setState((prevState) => ({
                     ...prevState,
+                    series: [
+                        {
+                            name: 'Call',
+                            data: data,
+                        },
+                    ],
                 }));
             } catch (error) {
                 console.error('Error fetching data:', error);
