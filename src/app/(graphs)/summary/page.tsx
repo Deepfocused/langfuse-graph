@@ -18,6 +18,8 @@ Type 'any' is not assignable to type 'never'.
 export default function Summary({
     height = 640,
     fontSize = 28,
+    name = '',
+    userId = '',
     traceId = '',
 }: any) {
     const [state, setState] = useState<ChartProps>({
@@ -139,10 +141,9 @@ export default function Summary({
     useEffect(() => {
         const fetchData = async () => {
             try {
-                let url = '/langfuse/summary';
-                if (id) {
-                    url += `?traceId=${id}`;
-                }
+                const url = id
+                    ? `/langfuse/summary?traceId=${id}`
+                    : '/langfuse/summary';
                 const response = await fetch(url); // ex) ?traceId=e1b1b1b1-1b1b-1b1b-1b1b-1b1b1b1b1b1b(인자로 받기)
                 const result = await response.json();
 
