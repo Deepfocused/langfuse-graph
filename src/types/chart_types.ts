@@ -10,7 +10,7 @@ export interface GraphProps {
 }
 export interface ChartProps {
     series: ApexOptions['series'];
-    options: ApexOptions;
+    options?: ApexOptions;
 }
 
 /**
