@@ -132,10 +132,13 @@ export default function Call({
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const url = id
-                    ? `/langfuse/call?traceId=${id}`
-                    : '/langfuse/call';
-                const response = await fetch(url);
+                const url = new URL('/langfuse/call', window.location.origin);
+                if (id) url.searchParams.append('traceId', id);
+                if (name) url.searchParams.append('name', name);
+                if (userId) url.searchParams.append('userId', userId);
+
+                const response = await fetch(url.toString());
+
                 if (!response.ok) {
                     setState((prevState) => ({
                         ...prevState,
