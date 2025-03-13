@@ -1,5 +1,4 @@
 'use client';
-
 import { useEffect, useState } from 'react';
 import type { GraphProps, ChartProps } from '@/types/chart_types';
 import dynamic from 'next/dynamic';
@@ -143,10 +142,16 @@ export default function Summary({
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const url = id
-                    ? `/langfuse/summary?traceId=${id}`
-                    : '/langfuse/summary';
-                const response = await fetch(url);
+                const url = new URL(
+                    '/langfuse/summary',
+                    window.location.origin,
+                );
+                if (id) url.searchParams.append('traceId', id);
+                if (name) url.searchParams.append('name', name);
+                if (userId) url.searchParams.append('userId', userId);
+
+                const response = await fetch(url.toString());
+
                 if (!response.ok) {
                     setState((prevState) => ({
                         ...prevState,
