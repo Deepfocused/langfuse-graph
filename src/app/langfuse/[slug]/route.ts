@@ -31,8 +31,8 @@ const fetchObservationsData = async (userId: string, traceId: string) => {
 };
 
 const processObservations = (
-    observations: any[],
-    modelNames: string[],
+    observations: Array<any>,
+    modelNames: Array<string>,
     startTime: string,
 ) => {
     /* 💥 모델이 추가시 변경이 필요한 부분 💥*/
@@ -122,12 +122,6 @@ export async function GET(
     const userId: string = searchParams.get('userId') || 'woongsik';
     const specificTraceId: string | null = searchParams.get('traceId');
 
-    /* 💥 모델이 추가시 변경이 필요한 부분 💥*/
-    const modelNames: Array<string> = [
-        'claude-3-5-sonnet-20241022',
-        'llama3.3',
-    ];
-
     try {
         const traceSelected: any = await fetchTraceData(
             name,
@@ -140,6 +134,23 @@ export async function GET(
                 { error: 'No trace found' },
                 { status: 404 },
             );
+        }
+
+        /* 💥 모델 이름 얻기 💥*/
+        let modelNames: Array<string> = [];
+        for (const observation of await fetchObservationsData(
+            userId,
+            traceSelected.id,
+        )) {
+            if (observation.type === 'GENERATION') {
+                // GENERATION이 LLM 사용하는 부분
+                if (
+                    observation.model &&
+                    !modelNames.includes(observation.model)
+                ) {
+                    modelNames.push(observation.model);
+                }
+            }
         }
         const startTime: string = traceSelected.createdAt;
         const {
