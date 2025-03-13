@@ -157,28 +157,24 @@ export default function Time({
                     ? `/langfuse/time?traceId=${id}`
                     : '/langfuse/time';
                 const response = await fetch(url);
-                // 예외 처리 필요
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                let result;
-                try {
-                    result = await response.json();
-                } catch (jsonError) {
-                    throw new Error('Failed to parse JSON');
-                }
+                    setState((prevState) => ({
+                        ...prevState,
+                    }));
+                } else {
+                    let result;
+                    try {
+                        result = await response.json();
+                    } catch (jsonError) {
+                        setState((prevState) => ({
+                            ...prevState,
+                        }));
+                    }
 
-                setState((prevState) => ({
-                    ...prevState,
-                    // series: [
-                    //     {
-                    //         data: result.map((item: any) => ({
-                    //             x: item.model,
-                    //             y: [item.startTime, item.endTime],
-                    //         })),
-                    //     },
-                    // ],
-                }));
+                    setState((prevState) => ({
+                        ...prevState,
+                    }));
+                }
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
