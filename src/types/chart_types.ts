@@ -8,9 +8,10 @@ export interface GraphProps {
     userId?: string;
     traceId?: string;
 }
-export interface ChartProps {
-    series: ApexOptions['series'];
-    options?: ApexOptions;
+
+export interface ChartProps<T = ApexOptions['series'], U = any> {
+    series: T;
+    options?: U;
 }
 
 /**
@@ -18,10 +19,6 @@ export interface ChartProps {
  객체가 여러 Key를 가질 수 있으며 Key와 매칭되는 value를 가지는 경우 사용 
  */
 
-export interface LlmTimeAndSummaryData {
-    [key: string]: Array<number>;
-}
-
-export interface LlmCallCountData {
-    [key: string]: number;
+export interface LlmType<T = Array<Array<number>>> {
+    [key: string]: T;
 }
