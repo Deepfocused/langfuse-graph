@@ -18,7 +18,7 @@ export interface ChartProps {
  객체가 여러 Key를 가질 수 있으며 Key와 매칭되는 value를 가지는 경우 사용 
  */
 
-export interface LlmSummaryData {
+export interface LlmTimeAndSummaryData {
     [key: string]: Array<number>;
 }
 
