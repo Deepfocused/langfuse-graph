@@ -25,8 +25,11 @@ const fetchTraceData = async (
     }
 };
 
-const fetchObservationsData = async (userId: string, traceId: string) => {
-    const observations = await langfuse.fetchObservations({ userId, traceId });
+const fetchObservationsData: any = async (userId: string, traceId: string) => {
+    const observations: any = await langfuse.fetchObservations({
+        userId,
+        traceId,
+    });
     return observations.data;
 };
 
@@ -35,14 +38,20 @@ const processObservations = (
     modelNames: Array<string>,
     startTime: string,
 ) => {
-    /* 💥 모델이 추가시 변경이 필요한 부분 💥*/
-    const llmLatency: Array<Array<number>> = [[], []];
-    const llmStartTime: Array<Array<number>> = [[], []];
-    const llmEndTime: Array<Array<number>> = [[], []];
-    const llmInputTokenCount: Array<Array<number>> = [[], []];
-    const llmOutputTokenCount: Array<Array<number>> = [[], []];
-    const llmToktalTokenCount: Array<Array<number>> = [[], []];
-    const llmCallCount: Array<number> = [0, 0];
+    const modelNumber: number = modelNames.length;
+    const initializeArray = (length: number) =>
+        Array.from({ length }, () => []);
+
+    const llmLatency: Array<Array<number>> = initializeArray(modelNumber);
+    const llmStartTime: Array<Array<number>> = initializeArray(modelNumber);
+    const llmEndTime: Array<Array<number>> = initializeArray(modelNumber);
+    const llmInputTokenCount: Array<Array<number>> =
+        initializeArray(modelNumber);
+    const llmOutputTokenCount: Array<Array<number>> =
+        initializeArray(modelNumber);
+    const llmToktalTokenCount: Array<Array<number>> =
+        initializeArray(modelNumber);
+    const llmCallCount: Array<number> = Array(modelNumber).fill(0);
 
     for (const observation of observations) {
         // 가장 최근 것 부터 처리
@@ -138,10 +147,11 @@ export async function GET(
 
         /* 💥 모델 이름 얻기 💥*/
         let modelNames: Array<string> = [];
-        for (const observation of await fetchObservationsData(
+        const observations: Array<any> = await fetchObservationsData(
             userId,
             traceSelected.id,
-        )) {
+        );
+        for (const observation of observations) {
             if (observation.type === 'GENERATION') {
                 // GENERATION이 LLM 사용하는 부분
                 if (
@@ -161,11 +171,7 @@ export async function GET(
             llmOutputTokenCount,
             llmToktalTokenCount,
             llmCallCount,
-        } = processObservations(
-            await fetchObservationsData(userId, traceSelected.id),
-            modelNames,
-            startTime,
-        );
+        } = processObservations(observations, modelNames, startTime);
         const { slug } = await params;
 
         switch (slug) {
