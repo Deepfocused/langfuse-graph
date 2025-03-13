@@ -141,10 +141,7 @@ export async function GET(
                 { status: 404 },
             );
         }
-
-        // const allLatency: number = parseFloat(traceSelected.latency.toFixed(2));
         const startTime: string = traceSelected.createdAt;
-
         const {
             llmLatency,
             llmStartTime,
