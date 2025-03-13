@@ -87,6 +87,18 @@ const defaultChartOptions = (fontSize: number) => ({
             },
         },
     },
+    grid: {
+        xaxis: {
+            lines: {
+                show: true,
+            },
+        },
+        yaxis: {
+            lines: {
+                show: false,
+            },
+        },
+    },
     tooltip: {
         theme: 'dark',
     },
