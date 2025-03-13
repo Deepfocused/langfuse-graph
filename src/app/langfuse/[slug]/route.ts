@@ -5,24 +5,20 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { Langfuse } from 'langfuse';
 import type { LlmCallCountData, LlmSummaryData } from '@/types/chart_types';
 
+// 이차원 배열 오름차순 정렬
+const sortArrays = (arrays: string[][]) => {
+    return arrays.map((innerArray) =>
+        innerArray.sort(
+            (a, b) => new Date(a).getTime() - new Date(b).getTime(),
+        ),
+    );
+};
+
 const langfuse = new Langfuse({
     publicKey: process.env.LANGFUSE_PUBLIC_KEY || '',
     secretKey: process.env.LANGFUSE_SECRET_KEY || '',
     baseUrl: process.env.LANGFUSE_BASE_URL || '',
 });
-
-const options: Intl.DateTimeFormatOptions = {
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-    timeZone: 'Asia/Seoul',
-    hour12: false,
-};
-
-const formatTime = (dateString: string) => {
-    const date = new Date(dateString);
-    return new Intl.DateTimeFormat('ko-KR', options).format(date);
-};
 
 const fetchTraceData = async (
     name: string,
@@ -46,6 +42,8 @@ const fetchObservationsData = async (userId: string, traceId: string) => {
 const processObservations = (observations: any[], llmModel: string[]) => {
     /* 💥 모델이 추가시 변경이 필요한 부분 💥*/
     const llmLatency: Array<Array<number>> = [[], []];
+    const llmStartTime: Array<Array<string>> = [[], []];
+    const llmEndTime: Array<Array<string>> = [[], []];
     const llmInputTokenCount: Array<Array<number>> = [[], []];
     const llmOutputTokenCount: Array<Array<number>> = [[], []];
     const llmToktalTokenCount: Array<Array<number>> = [[], []];
@@ -60,6 +58,9 @@ const processObservations = (observations: any[], llmModel: string[]) => {
                         (Math.round(observation.latency) / 1000).toFixed(2),
                     ),
                 ); // ms -> s
+                llmStartTime[modelIndex].push(observation.startTime);
+                llmEndTime[modelIndex].push(observation.endTime);
+
                 llmInputTokenCount[modelIndex].push(observation.promptTokens);
                 llmOutputTokenCount[modelIndex].push(
                     observation.completionTokens,
@@ -69,9 +70,14 @@ const processObservations = (observations: any[], llmModel: string[]) => {
             }
         }
     }
+    const sortedllmStartTime = sortArrays(llmStartTime);
+    const sortedllmEndTime = sortArrays(llmEndTime);
 
+    // 구조 분해 할당 사용
     return {
         llmLatency,
+        sortedllmStartTime,
+        sortedllmEndTime,
         llmInputTokenCount,
         llmOutputTokenCount,
         llmToktalTokenCount,
@@ -105,8 +111,13 @@ export async function GET(
             );
         }
 
+        const allLatency: number = traceSelected.latency;
+        const startTime: string = traceSelected.createdAt;
+
         const {
             llmLatency,
+            sortedllmStartTime,
+            sortedllmEndTime,
             llmInputTokenCount,
             llmOutputTokenCount,
             llmToktalTokenCount,
@@ -115,6 +126,9 @@ export async function GET(
             await fetchObservationsData(userId, traceSelected.id),
             llmModel,
         );
+
+        console.log(sortedllmStartTime);
+        console.log(sortedllmEndTime);
 
         const { slug } = await params;
 
@@ -159,7 +173,6 @@ export async function GET(
                 );
         }
     } catch (error) {
-        console.error('Error fetching trace data:', error);
         return NextResponse.json(
             { error: 'Failed to fetch trace data' },
             { status: 500 },
