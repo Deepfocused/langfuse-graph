@@ -124,23 +124,26 @@ export default function Call({
                     ? `/langfuse/call?traceId=${id}`
                     : '/langfuse/call';
                 const response = await fetch(url);
-                // 예외 처리 필요
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
+                    setState((prevState) => ({
+                        ...prevState,
+                    }));
+                } else {
+                    let result;
+                    try {
+                        result = await response.json();
+                    } catch (jsonError) {
+                        setState((prevState) => ({
+                            ...prevState,
+                        }));
+                    }
+                    const data: Array<number> = Object.values(result);
 
-                let result;
-                try {
-                    result = await response.json();
-                } catch (jsonError) {
-                    throw new Error('Failed to parse JSON');
+                    setState((prevState) => ({
+                        ...prevState,
+                        series: [{ name: 'Call', data }],
+                    }));
                 }
-                const data: Array<number> = Object.values(result);
-
-                setState((prevState) => ({
-                    ...prevState,
-                    series: [{ name: 'Call', data }],
-                }));
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
