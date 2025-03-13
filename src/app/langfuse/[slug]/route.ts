@@ -3,11 +3,7 @@
 // https://nextjs.org/docs/app/api-reference/file-conventions/route
 import { type NextRequest, NextResponse } from 'next/server';
 import { Langfuse } from 'langfuse';
-import type {
-    LlmTokenType,
-    LlmCallCountType,
-    LlmSummaryType,
-} from '@/types/chart_types';
+import type { LlmType } from '@/types/chart_types';
 
 const langfuse = new Langfuse({
     publicKey: process.env.LANGFUSE_PUBLIC_KEY || '',
@@ -34,41 +30,24 @@ const fetchObservationsData = async (userId: string, traceId: string) => {
     return observations.data;
 };
 
-const calculateMidTime = (
-    time1: string,
-    time2: string,
-    startTime: string,
-): number => {
-    const date1 = new Date(time1);
-    const date2 = new Date(time2);
-    const startDate = new Date(startTime);
-    const midTime = (date1.getTime() + date2.getTime()) / 2;
-    return parseFloat(((midTime - startDate.getTime()) / 1000).toFixed(2)); // ms -> s
-};
-
-// 이차원 배열 오름차순 정렬
-const sortArrays = (arrays: Array<Array<number>>) => {
-    return arrays.map((innerArray) => innerArray.sort((a, b) => a - b));
-};
-
 const processObservations = (
     observations: any[],
-    llmModel: string[],
+    modelNames: string[],
     startTime: string,
 ) => {
     /* 💥 모델이 추가시 변경이 필요한 부분 💥*/
     const llmLatency: Array<Array<number>> = [[], []];
     const llmStartTime: Array<Array<number>> = [[], []];
     const llmEndTime: Array<Array<number>> = [[], []];
-    const llmMidTime: Array<Array<number>> = [[], []];
     const llmInputTokenCount: Array<Array<number>> = [[], []];
     const llmOutputTokenCount: Array<Array<number>> = [[], []];
     const llmToktalTokenCount: Array<Array<number>> = [[], []];
     const llmCallCount: Array<number> = [0, 0];
 
     for (const observation of observations) {
+        // 가장 최근 것 부터 처리
         if (observation.type === 'GENERATION') {
-            const modelIndex = llmModel.indexOf(observation.model);
+            const modelIndex = modelNames.indexOf(observation.model);
             if (modelIndex !== -1) {
                 llmLatency[modelIndex].push(
                     parseFloat(
@@ -95,14 +74,6 @@ const processObservations = (
                             .toFixed(2),
                     ),
                 );
-                llmMidTime[modelIndex].push(
-                    calculateMidTime(
-                        observation.startTime,
-                        observation.endTime,
-                        startTime,
-                    ),
-                );
-
                 llmInputTokenCount[modelIndex].push(observation.promptTokens);
                 llmOutputTokenCount[modelIndex].push(
                     observation.completionTokens,
@@ -112,20 +83,34 @@ const processObservations = (
             }
         }
     }
-    console.log(llmStartTime);
-    console.log(llmEndTime);
-    console.log(llmMidTime);
     // 구조 분해 할당 사용
     return {
         llmLatency,
-        llmStartTime: sortArrays(llmStartTime),
-        llmEndTime: sortArrays(llmEndTime),
-        llmMidTime: sortArrays(llmMidTime),
+        llmStartTime,
+        llmEndTime,
         llmInputTokenCount,
         llmOutputTokenCount,
         llmToktalTokenCount,
         llmCallCount,
     };
+};
+
+const createCombinedArray = (
+    arr1: Array<Array<number>>,
+    arr2: Array<Array<number>>,
+    arr3: Array<Array<number>>,
+    modelNames: Array<string>,
+) => {
+    return arr1.reduce<LlmType>((acc, subArray, i) => {
+        subArray.forEach((value, j) => {
+            const key = modelNames[i];
+            if (!acc[key]) {
+                acc[key] = [];
+            }
+            acc[key].push([value, arr2[i][j], arr3[i][j]]);
+        });
+        return acc;
+    }, {});
 };
 
 export async function GET(
@@ -138,10 +123,13 @@ export async function GET(
     const specificTraceId: string | null = searchParams.get('traceId');
 
     /* 💥 모델이 추가시 변경이 필요한 부분 💥*/
-    const llmModel: Array<string> = ['claude-3-5-sonnet-20241022', 'llama3.3'];
+    const modelNames: Array<string> = [
+        'claude-3-5-sonnet-20241022',
+        'llama3.3',
+    ];
 
     try {
-        const traceSelected = await fetchTraceData(
+        const traceSelected: any = await fetchTraceData(
             name,
             userId,
             specificTraceId,
@@ -154,55 +142,45 @@ export async function GET(
             );
         }
 
-        const allLatency: number = parseFloat(traceSelected.latency.toFixed(2));
+        // const allLatency: number = parseFloat(traceSelected.latency.toFixed(2));
         const startTime: string = traceSelected.createdAt;
 
         const {
             llmLatency,
             llmStartTime,
             llmEndTime,
-            llmMidTime,
             llmInputTokenCount,
             llmOutputTokenCount,
             llmToktalTokenCount,
             llmCallCount,
         } = processObservations(
             await fetchObservationsData(userId, traceSelected.id),
-            llmModel,
+            modelNames,
             startTime,
         );
-
         const { slug } = await params;
 
         switch (slug) {
             case 'time':
-                const llmTimeData = llmModel.reduce<LlmSummaryType>(
-                    (result, name, index) => {
-                        result[name] = [
-                            llmLatency[index].reduce((a, b) => a + b, 0),
-                            allLatency,
-                        ];
-                        return result;
-                    },
-                    {},
+                const llmTimeData: LlmType = createCombinedArray(
+                    llmStartTime,
+                    llmEndTime,
+                    llmLatency,
+                    modelNames,
                 );
                 return NextResponse.json(llmTimeData, {
                     status: 200,
                 });
             case 'token':
-                const llmTokenData = llmModel.reduce<LlmTokenType>(
-                    (result, name, index) => {
-                        result[name] = [
-                            llmMidTime[index], // x axis
-                            llmToktalTokenCount[index], // y axis
-                        ];
-                        return result;
-                    },
-                    {},
+                const llmTokenData: LlmType = createCombinedArray(
+                    llmStartTime,
+                    llmEndTime,
+                    llmToktalTokenCount,
+                    modelNames,
                 );
                 return NextResponse.json(llmTokenData, { status: 200 });
             case 'call':
-                const llmCallCountData = llmModel.reduce<LlmCallCountType>(
+                const llmCallCountData = modelNames.reduce<LlmType<number>>(
                     (result, name, index) => {
                         result[name] = llmCallCount[index];
                         return result;
@@ -211,24 +189,17 @@ export async function GET(
                 );
                 return NextResponse.json(llmCallCountData, { status: 200 });
             case 'summary':
-                const llmSummaryData = llmModel.reduce<LlmSummaryType>(
-                    (result, name, index) => {
-                        result[name] = [
-                            llmLatency[index].reduce((a, b) => a + b, 0),
-                            llmInputTokenCount[index].reduce(
-                                (a, b) => a + b,
-                                0,
-                            ),
-                            llmOutputTokenCount[index].reduce(
-                                (a, b) => a + b,
-                                0,
-                            ),
-                            llmCallCount[index],
-                        ];
-                        return result;
-                    },
-                    {},
-                );
+                const llmSummaryData = modelNames.reduce<
+                    LlmType<Array<number>>
+                >((result, name, index) => {
+                    result[name] = [
+                        llmLatency[index].reduce((a, b) => a + b, 0),
+                        llmInputTokenCount[index].reduce((a, b) => a + b, 0),
+                        llmOutputTokenCount[index].reduce((a, b) => a + b, 0),
+                        llmCallCount[index],
+                    ];
+                    return result;
+                }, {});
                 return NextResponse.json(llmSummaryData, { status: 200 });
             default:
                 return NextResponse.json(
