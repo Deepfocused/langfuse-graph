@@ -10,7 +10,7 @@ const ReactApexChart = dynamic(() => import('react-apexcharts'), {
 
 const defaultChartOptions = (fontSize: number) => ({
     title: {
-        text: '🦾 LLM Token Usage 🦾',
+        text: '🦾 Token TimeLine 🦾',
         align: 'center',
         style: {
             fontSize: `${fontSize}px`,
@@ -71,7 +71,7 @@ const defaultChartOptions = (fontSize: number) => ({
                 fontSize: '16px',
             },
         },
-        categories: ['0', '8', '2', '3', '3', '4', '5'],
+        categories: [0],
         labels: {
             show: true,
             style: {
@@ -84,6 +84,18 @@ const defaultChartOptions = (fontSize: number) => ({
             show: true,
             style: {
                 fontSize: '14px',
+            },
+        },
+    },
+    grid: {
+        xaxis: {
+            lines: {
+                show: false,
+            },
+        },
+        yaxis: {
+            lines: {
+                show: true,
             },
         },
     },
@@ -110,11 +122,11 @@ export default function Token({
         series: [
             {
                 name: 'Claude-3.5',
-                data: [31, 40, 28, 51, 42, 109, 200],
+                data: [0],
             },
             {
                 name: 'Llama 3.3',
-                data: [11, 32, 45, 32, 34, 52, 41],
+                data: [0],
             },
         ],
         options: defaultChartOptions(fontSize),
@@ -146,7 +158,6 @@ export default function Token({
                             ...prevState,
                         }));
                     }
-
                     setState((prevState) => ({
                         ...prevState,
                     }));
