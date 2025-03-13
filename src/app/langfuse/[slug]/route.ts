@@ -55,7 +55,11 @@ const processObservations = (observations: any[], llmModel: string[]) => {
         if (observation.type === 'GENERATION') {
             const modelIndex = llmModel.indexOf(observation.model);
             if (modelIndex !== -1) {
-                llmLatency[modelIndex].push(Math.round(observation.latency)); // ms -> s
+                llmLatency[modelIndex].push(
+                    parseFloat(
+                        (Math.round(observation.latency) / 1000).toFixed(2),
+                    ),
+                ); // ms -> s
                 llmInputTokenCount[modelIndex].push(observation.promptTokens);
                 llmOutputTokenCount[modelIndex].push(
                     observation.completionTokens,
