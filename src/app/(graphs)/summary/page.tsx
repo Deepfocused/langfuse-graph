@@ -167,7 +167,9 @@ export default function Summary({
                     }));
                 }
             } catch (error) {
-                console.error('Error fetching data:', error);
+                setState((prevState) => ({
+                    ...prevState,
+                }));
             }
         };
         fetchData();
