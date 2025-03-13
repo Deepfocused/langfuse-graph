@@ -117,6 +117,7 @@ export default function Summary({
             { name: 'Latency(ms)', data: [0, 0] },
             { name: 'Input Token', data: [0, 0] },
             { name: 'Output Token', data: [0, 0] },
+            { name: 'Call Count', data: [0, 0] },
         ],
         options: defaultChartOptions(fontSize),
     });
@@ -134,32 +135,37 @@ export default function Summary({
                     ? `/langfuse/summary?traceId=${id}`
                     : '/langfuse/summary';
                 const response = await fetch(url);
-                // 예외 처리 필요
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    setState((prevState) => ({
+                        ...prevState,
+                    }));
+                } else {
+                    let result;
+                    try {
+                        result = await response.json();
+                    } catch (jsonError) {
+                        setState((prevState) => ({
+                            ...prevState,
+                        }));
+                    }
+
+                    const data: Array<Array<number>> = Object.values(result);
+
+                    // ex) [[1,2,3,4], [2,3,4,5]] => [[1,2], [2,3], [3,4], [4,5]]
+                    const processedData: Array<Array<number>> = data[0].map(
+                        (_, index) => data.map((array) => array[index]),
+                    );
+
+                    setState((prevState) => ({
+                        ...prevState,
+                        series: [
+                            { name: 'Latency(s)', data: processedData[0] },
+                            { name: 'Input Token', data: processedData[1] },
+                            { name: 'Output Token', data: processedData[2] },
+                            { name: 'Call Count', data: processedData[3] },
+                        ],
+                    }));
                 }
-                let result;
-                try {
-                    result = await response.json();
-                } catch (jsonError) {
-                    throw new Error('Failed to parse JSON');
-                }
-
-                const data: Array<Array<number>> = Object.values(result);
-
-                // ex) [[1,2,3,4], [2,3,4,5]] => [[1,2], [2,3], [3,4], [4,5]]
-                const processedData: Array<Array<number>> = data[0].map(
-                    (_, index) => data.map((array) => array[index]),
-                );
-
-                setState((prevState) => ({
-                    ...prevState,
-                    series: [
-                        { name: 'Latency(s)', data: processedData[0] },
-                        { name: 'Input Token', data: processedData[1] },
-                        { name: 'Output Token', data: processedData[2] },
-                    ],
-                }));
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
