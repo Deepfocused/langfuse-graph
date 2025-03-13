@@ -17,7 +17,7 @@ Type 'any' is not assignable to type 'never'.
 // 컴포넌트는 대문자
 const defaultChartOptions = (fontSize: number) => ({
     title: {
-        text: '🎢 LLM Inference Time 🎢',
+        text: '🎢 Inference Timeline 🎢',
         align: 'center',
         style: {
             fontSize: `${fontSize}px`,
@@ -81,6 +81,7 @@ const defaultChartOptions = (fontSize: number) => ({
             style: {
                 fontSize: '14px',
             },
+            formatter: (val: number): number => Math.round(val),
         },
         title: {
             text: '⏳ Time(s) ⌛',
@@ -128,7 +129,7 @@ export default function Time({
                 data: [
                     {
                         x: 'Claude-3.5',
-                        y: [0, 0],
+                        y: [0, 3],
                     },
                     {
                         x: 'Llama 3.3',
@@ -136,7 +137,7 @@ export default function Time({
                     },
                     {
                         x: 'All time',
-                        y: [0, 0],
+                        y: [0, 10],
                     },
                 ],
             },
@@ -170,7 +171,7 @@ export default function Time({
                             ...prevState,
                         }));
                     }
-
+                    // const data: Array<Array<number>> = Object.values(result);
                     setState((prevState) => ({
                         ...prevState,
                     }));
