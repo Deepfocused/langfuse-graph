@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import type { GraphProps, ChartProps } from '@/types/chart_types';
+import { transformDataForTime as transformData } from '@/utils/util';
 import dynamic from 'next/dynamic';
 
 const ReactApexChart = dynamic(() => import('react-apexcharts'), {
@@ -25,9 +26,8 @@ const defaultChartOptions = (fontSize: number) => ({
             offsetX: 25,
             offsetY: 0,
         },
+        type: 'rangeBar',
         foreColor: '#FFFFFF',
-        height: 350,
-        type: 'area',
         dropShadow: {
             enabled: true,
             color: '#FFFFFF',
@@ -40,30 +40,43 @@ const defaultChartOptions = (fontSize: number) => ({
             enabled: false,
         },
     },
-    colors: ['#69d2e7', '#FF4560'],
+    // colors: ['#69d2e7', '#FF4560'],
+    plotOptions: {
+        bar: {
+            barHeight: '30%',
+            horizontal: true,
+            rangeBarGroupRows: true,
+        },
+    },
     dataLabels: {
         enabled: true,
         style: {
             fontSize: '14px',
+            colors: ['#FFFFFF'],
+        },
+        formatter: function (val: any) {
+            return (val[1] - val[0]).toFixed(2) + 's';
         },
     },
-    stroke: {
-        show: true,
-        curve: 'smooth',
-    },
     legend: {
+        show: true,
+        showForSingleSeries: true,
         position: 'top',
         horizontalAlign: 'center',
-        offsetX: 0,
-        offsetY: 0,
         fontSize: '16px',
-        customLegendItems: ['Claude-3.5', 'Llama 3.3'],
     },
     fill: {
         type: 'solid',
-        opacity: 0.5,
+        opacity: 1,
     },
     xaxis: {
+        labels: {
+            show: true,
+            style: {
+                fontSize: '14px',
+            },
+            formatter: (val: number): number => Math.round(val),
+        },
         title: {
             text: '⏳ Time(s) ⌛',
             offsetY: 10,
@@ -71,17 +84,10 @@ const defaultChartOptions = (fontSize: number) => ({
                 fontSize: '16px',
             },
         },
-        categories: [0],
-        labels: {
-            show: true,
-            style: {
-                fontSize: '14px',
-            },
-        },
     },
     yaxis: {
         labels: {
-            show: true,
+            show: false,
             style: {
                 fontSize: '14px',
             },
@@ -90,17 +96,48 @@ const defaultChartOptions = (fontSize: number) => ({
     grid: {
         xaxis: {
             lines: {
-                show: false,
+                show: true,
             },
         },
         yaxis: {
             lines: {
-                show: true,
+                show: false,
             },
         },
     },
     tooltip: {
         theme: 'dark',
+        custom: function (opts: any) {
+            const w = opts.ctx.w;
+            let ylabel = '';
+            if (
+                w.config.series[opts.seriesIndex].data &&
+                w.config.series[opts.seriesIndex].data[opts.dataPointIndex]
+            ) {
+                ylabel =
+                    w.config.series[opts.seriesIndex].data[opts.dataPointIndex]
+                        .x;
+            }
+            let seriesName = w.config.series[opts.seriesIndex].name
+                ? w.config.series[opts.seriesIndex].name
+                : '';
+            const color = w.globals.colors[opts.seriesIndex];
+
+            return (
+                '<div class="apexcharts-tooltip-rangebar">' +
+                '<div> <span class="series-name" style="color: ' +
+                color +
+                '">' +
+                (seriesName ? seriesName : '') +
+                '</span></div>' +
+                '<div> <span class="category">' +
+                ylabel +
+                ' </span> <span class="value start-value">' +
+                (opts.y2 - opts.y1) +
+                '</span></div>' +
+                '</div>'
+            );
+        },
     },
 });
 
@@ -117,34 +154,21 @@ export default function Token({
     name = '',
     userId = '',
     traceId = '',
+    sessionId = '',
 }: GraphProps) {
     const [state, setState] = useState<ChartProps>({
-        series: [
-            {
-                name: 'Claude-3.5',
-                data: [0],
-            },
-            {
-                name: 'Llama 3.3',
-                data: [0],
-            },
-        ],
+        series: [],
         options: defaultChartOptions(fontSize),
     });
-
-    const [id, setId] = useState<string>(traceId);
-
-    useEffect(() => {
-        setId(traceId);
-    }, [traceId]);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const url = new URL('/langfuse/token', window.location.origin);
-                if (id) url.searchParams.append('traceId', id);
                 if (name) url.searchParams.append('name', name);
+                if (traceId) url.searchParams.append('traceId', traceId);
                 if (userId) url.searchParams.append('userId', userId);
+                if (sessionId) url.searchParams.append('sessionId', sessionId);
 
                 const response = await fetch(url.toString());
 
@@ -161,8 +185,10 @@ export default function Token({
                             ...prevState,
                         }));
                     }
+                    const transformedData = transformData(result, 'Token');
                     setState((prevState) => ({
                         ...prevState,
+                        series: transformedData,
                     }));
                 }
             } catch (error) {
@@ -172,14 +198,14 @@ export default function Token({
             }
         };
         fetchData();
-    }, [id]);
+    }, [name, userId, traceId, sessionId]);
 
     return (
         <ReactApexChart
             className="mx-8 my-6"
             options={state.options}
             series={state.series}
-            type="area"
+            type="rangeBar"
             height={height}
         />
     );
