@@ -25,7 +25,7 @@ const defaultChartOptions = (fontSize: number) => ({
             offsetX: 25,
             offsetY: 0,
         },
-        type: 'bar' as 'bar',
+        type: 'bar',
         foreColor: '#FFFFFF',
         dropShadow: {
             enabled: true,
@@ -36,47 +36,49 @@ const defaultChartOptions = (fontSize: number) => ({
             opacity: 0.7,
         },
     },
+    // colors: ['#69d2e7', '#FF4560'],
     plotOptions: {
         bar: {
-            barHeight: '21%',
+            barHeight: '50%',
             distributed: true,
-            horizontal: true,
+            // horizontal: false,
             dataLabels: {
-                position: 'center',
+                position: 'top',
             },
         },
     },
-    colors: ['#69d2e7', '#FF4560'],
     dataLabels: {
         enabled: true,
         style: {
             fontSize: '14px',
             colors: ['#FFFFFF'],
         },
+        offsetY: -18,
     },
     legend: {
         show: true,
         showForSingleSeries: true,
-        position: 'bottom',
+        position: 'top',
         horizontalAlign: 'center',
-        offsetX: 0,
-        offsetY: 0,
         fontSize: '16px',
-        customLegendItems: ['Claude-3.5', 'Llama 3.3'],
     },
     fill: {
         type: 'solid',
         opacity: 1,
     },
     xaxis: {
-        stepSize: 1,
-        categories: ['Claude-3.5', 'LLama 3.3'],
         labels: {
             show: true,
             style: {
                 fontSize: '14px',
             },
-            formatter: (val: number): number => Math.round(val),
+        },
+        title: {
+            text: '🗽 Model 🗽',
+            offsetY: 0,
+            style: {
+                fontSize: '16px',
+            },
         },
     },
     yaxis: {
@@ -85,17 +87,18 @@ const defaultChartOptions = (fontSize: number) => ({
             style: {
                 fontSize: '14px',
             },
+            formatter: (val: number): number => Math.round(val),
         },
     },
     grid: {
         xaxis: {
             lines: {
-                show: true,
+                show: false,
             },
         },
         yaxis: {
             lines: {
-                show: false,
+                show: true,
             },
         },
     },
@@ -117,25 +120,21 @@ export default function Call({
     name = '',
     userId = '',
     traceId = '',
+    sessionId = '',
 }: GraphProps) {
     const [state, setState] = useState<ChartProps>({
-        series: [{ name: 'Call', data: [0, 0] }],
+        series: [],
         options: defaultChartOptions(fontSize),
     });
-
-    const [id, setId] = useState<string>(traceId);
-
-    useEffect(() => {
-        setId(traceId);
-    }, [traceId]);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const url = new URL('/langfuse/call', window.location.origin);
-                if (id) url.searchParams.append('traceId', id);
                 if (name) url.searchParams.append('name', name);
+                if (traceId) url.searchParams.append('traceId', traceId);
                 if (userId) url.searchParams.append('userId', userId);
+                if (sessionId) url.searchParams.append('sessionId', sessionId);
 
                 const response = await fetch(url.toString());
 
@@ -153,10 +152,16 @@ export default function Call({
                         }));
                     }
                     const data: Array<number> = Object.values(result);
+                    const axisCategories: Array<string> = Object.keys(result);
 
                     setState((prevState) => ({
                         ...prevState,
-                        series: [{ name: 'Call', data }],
+                        series: [{ name: 'Call Count', data }],
+                        options: {
+                            xaxis: {
+                                categories: axisCategories,
+                            },
+                        },
                     }));
                 }
             } catch (error) {
@@ -166,7 +171,7 @@ export default function Call({
             }
         };
         fetchData();
-    }, [id]);
+    }, [name, userId, traceId, sessionId]);
 
     return (
         <ReactApexChart
