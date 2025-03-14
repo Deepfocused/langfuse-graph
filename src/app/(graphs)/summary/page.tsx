@@ -9,6 +9,15 @@ const ReactApexChart = dynamic(() => import('react-apexcharts'), {
 }); // browser에서만 렌더링해야하므로 ssr을 끔
 
 const defaultChartOptions = (titlefontSize: number) => ({
+    title: {
+        text: '🔊 Summary 🔊',
+        align: 'center',
+        style: {
+            fontSize: `${titlefontSize}px`,
+            fontWeight: 'bold',
+            color: '#FFFFFF',
+        },
+    },
     chart: {
         background: 'black',
         toolbar: {
@@ -39,15 +48,6 @@ const defaultChartOptions = (titlefontSize: number) => ({
             dataLabels: {
                 position: 'top',
             },
-        },
-    },
-    title: {
-        text: '🔊 Summary 🔊',
-        align: 'center',
-        style: {
-            fontSize: `${titlefontSize}px`,
-            fontWeight: 'bold',
-            color: '#FFFFFF',
         },
     },
     dataLabels: {
