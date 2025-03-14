@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import type { GraphProps, ChartProps } from '@/types/chart_types';
+import { transformDataForSummary as transformData } from '@/utils/util';
 import dynamic from 'next/dynamic';
 
 const ReactApexChart = dynamic(() => import('react-apexcharts'), {
@@ -25,13 +26,19 @@ const defaultChartOptions = (fontSize: number) => ({
             blur: 21,
             opacity: 0.7,
         },
+        zoom: {
+            enabled: false,
+        },
     },
     plotOptions: {
         bar: {
             horizontal: false,
-            columnWidth: '70%',
-            borderRadius: 2,
+            columnWidth: '60%',
+            borderRadius: 5,
             borderRadiusApplication: 'end',
+            dataLabels: {
+                position: 'top',
+            },
         },
     },
     title: {
@@ -49,34 +56,26 @@ const defaultChartOptions = (fontSize: number) => ({
             fontSize: '14px',
             colors: ['#FFFFFF'],
         },
+        offsetY: -18,
     },
     stroke: {
         show: true,
-        width: 1,
+        width: 5,
         curve: 'smooth',
         colors: ['transparent'],
     },
     legend: {
         show: true,
         showForSingleSeries: true,
-        position: 'bottom',
+        position: 'top',
         horizontalAlign: 'center',
-        offsetX: 0,
-        offsetY: 0,
         fontSize: '16px',
-        customLegendItems: [
-            'Latency',
-            'Input Token',
-            'Output Token',
-            'Call Count',
-        ],
     },
     fill: {
         type: 'solid',
         opacity: 1,
     },
     xaxis: {
-        categories: ['Claude-3.5', 'Llama 3.3'],
         labels: {
             show: true,
             style: {
@@ -90,6 +89,7 @@ const defaultChartOptions = (fontSize: number) => ({
             style: {
                 fontSize: '14px',
             },
+            formatter: (val: number): number => Math.round(val),
         },
     },
     grid: {
@@ -122,22 +122,12 @@ export default function Summary({
     name = '',
     userId = '',
     traceId = '',
+    sessionId = '',
 }: GraphProps) {
     const [state, setState] = useState<ChartProps>({
-        series: [
-            { name: 'Latency(ms)', data: [0, 0] },
-            { name: 'Input Token', data: [0, 0] },
-            { name: 'Output Token', data: [0, 0] },
-            { name: 'Call Count', data: [0, 0] },
-        ],
+        series: [],
         options: defaultChartOptions(fontSize),
     });
-
-    const [id, setId] = useState<string>(traceId);
-
-    useEffect(() => {
-        setId(traceId);
-    }, [traceId]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -146,9 +136,10 @@ export default function Summary({
                     '/langfuse/summary',
                     window.location.origin,
                 );
-                if (id) url.searchParams.append('traceId', id);
                 if (name) url.searchParams.append('name', name);
+                if (traceId) url.searchParams.append('traceId', traceId);
                 if (userId) url.searchParams.append('userId', userId);
+                if (sessionId) url.searchParams.append('sessionId', sessionId);
 
                 const response = await fetch(url.toString());
 
@@ -165,22 +156,20 @@ export default function Summary({
                             ...prevState,
                         }));
                     }
-
-                    const data: Array<Array<number>> = Object.values(result);
-
-                    // ex) [[1,2,3,4], [2,3,4,5]] => [[1,2], [2,3], [3,4], [4,5]]
-                    const processedData: Array<Array<number>> = data[0].map(
-                        (_, index) => data.map((array) => array[index]),
-                    );
-
+                    const transformedData = transformData(result);
                     setState((prevState) => ({
                         ...prevState,
-                        series: [
-                            { name: 'Latency(s)', data: processedData[0] },
-                            { name: 'Input Token', data: processedData[1] },
-                            { name: 'Output Token', data: processedData[2] },
-                            { name: 'Call Count', data: processedData[3] },
-                        ],
+                        series: transformedData,
+                        options: {
+                            xaxis: {
+                                categories: [
+                                    'latency(s)',
+                                    'Input Token',
+                                    'Output Token',
+                                    'Call Count',
+                                ],
+                            },
+                        },
                     }));
                 }
             } catch (error) {
@@ -190,7 +179,7 @@ export default function Summary({
             }
         };
         fetchData();
-    }, [id]);
+    }, [name, userId, traceId, sessionId]);
 
     return (
         <ReactApexChart
