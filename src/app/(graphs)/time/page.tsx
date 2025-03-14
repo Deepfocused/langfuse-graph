@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import type { GraphProps, ChartProps } from '@/types/chart_types';
+import { transformDataForTime as transformData } from '@/utils/util';
 import dynamic from 'next/dynamic';
 
 const ReactApexChart = dynamic(() => import('react-apexcharts'), {
@@ -46,12 +47,12 @@ const defaultChartOptions = (fontSize: number) => ({
             enabled: false,
         },
     },
-    colors: ['#69d2e7', '#FF4560', '#AB45C0'],
+    // colors: ['#69d2e7', '#FF4560'],
     plotOptions: {
         bar: {
-            horizontal: true,
-            distributed: true,
             barHeight: '30%',
+            horizontal: true,
+            rangeBarGroupRows: true,
         },
     },
     dataLabels: {
@@ -60,16 +61,16 @@ const defaultChartOptions = (fontSize: number) => ({
             fontSize: '14px',
             colors: ['#FFFFFF'],
         },
+        formatter: function (val: any) {
+            return (val[1] - val[0]).toFixed(1) + 's';
+        },
     },
     legend: {
         show: true,
         showForSingleSeries: true,
         position: 'top',
         horizontalAlign: 'center',
-        offsetX: 0,
-        offsetY: 0,
         fontSize: '16px',
-        customLegendItems: ['Claude-3.5', 'Llama 3.3'],
     },
     fill: {
         type: 'solid',
@@ -93,7 +94,7 @@ const defaultChartOptions = (fontSize: number) => ({
     },
     yaxis: {
         labels: {
-            show: true,
+            show: false,
             style: {
                 fontSize: '14px',
             },
@@ -113,8 +114,47 @@ const defaultChartOptions = (fontSize: number) => ({
     },
     tooltip: {
         theme: 'dark',
+        custom: function (opts: any) {
+            const w = opts.ctx.w;
+            let ylabel = '';
+            if (
+                w.config.series[opts.seriesIndex].data &&
+                w.config.series[opts.seriesIndex].data[opts.dataPointIndex]
+            ) {
+                ylabel =
+                    w.config.series[opts.seriesIndex].data[opts.dataPointIndex]
+                        .x;
+            }
+            let seriesName = w.config.series[opts.seriesIndex].name
+                ? w.config.series[opts.seriesIndex].name
+                : '';
+            const color = w.globals.colors[opts.seriesIndex];
+
+            return (
+                '<div class="apexcharts-tooltip-rangebar">' +
+                '<div> <span class="series-name" style="color: ' +
+                color +
+                '">' +
+                (seriesName ? seriesName : '') +
+                '</span></div>' +
+                '<div> <span class="category">' +
+                ylabel +
+                ' </span> <span class="value start-value">' +
+                (opts.y2 - opts.y1) +
+                '</span></div>' +
+                '</div>'
+            );
+        },
     },
 });
+
+/*
+GraphProps 대신 any를 써야하는 이유 
+Type error: Type 'OmitWithTag<GraphProps, keyof PageProps, "default">' does not satisfy the constraint '{ [x: string]: never; }'.
+Property 'height' is incompatible with index signature.
+Type 'any' is not assignable to type 'never'.
+*/
+// 컴포넌트는 대문자
 
 export default function Time({
     height = 640,
@@ -122,42 +162,21 @@ export default function Time({
     name = '',
     userId = '',
     traceId = '',
+    sessionId = '',
 }: GraphProps) {
     const [state, setState] = useState<ChartProps>({
-        series: [
-            {
-                data: [
-                    {
-                        x: 'Claude-3.5',
-                        y: [0, 3],
-                    },
-                    {
-                        x: 'Llama 3.3',
-                        y: [0, 0],
-                    },
-                    {
-                        x: 'All time',
-                        y: [0, 10],
-                    },
-                ],
-            },
-        ],
+        series: [],
         options: defaultChartOptions(fontSize),
     });
-
-    const [id, setId] = useState<string>(traceId);
-
-    useEffect(() => {
-        setId(traceId);
-    }, [traceId]);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const url = new URL('/langfuse/time', window.location.origin);
-                if (id) url.searchParams.append('traceId', id);
                 if (name) url.searchParams.append('name', name);
+                if (traceId) url.searchParams.append('traceId', traceId);
                 if (userId) url.searchParams.append('userId', userId);
+                if (sessionId) url.searchParams.append('sessionId', sessionId);
 
                 const response = await fetch(url.toString());
 
@@ -174,9 +193,10 @@ export default function Time({
                             ...prevState,
                         }));
                     }
-                    // const data: Array<Array<number>> = Object.values(result);
+                    const transformedData = transformData(result);
                     setState((prevState) => ({
                         ...prevState,
+                        series: transformedData,
                     }));
                 }
             } catch (error) {
@@ -186,7 +206,7 @@ export default function Time({
             }
         };
         fetchData();
-    }, [id]);
+    }, [name, userId, traceId, sessionId]);
 
     return (
         <ReactApexChart
