@@ -12,21 +12,22 @@ const langfuse = new Langfuse({
 });
 
 const fetchTraceData = async (
-    name: string,
+    sessionId: string,
     userId: string,
-    specificTraceId: string | null,
+    specificTraceId: string,
+    name: string,
 ) => {
     if (specificTraceId) {
         const trace = await langfuse.fetchTrace(specificTraceId);
         return trace.data;
     } else {
-        const traces = await langfuse.fetchTraces({ name, userId });
+        const traces = await langfuse.fetchTraces({ name, userId, sessionId });
         return traces.data[0];
     }
 };
 
-const fetchObservationsData: any = async (userId: string, traceId: string) => {
-    const observations: any = await langfuse.fetchObservations({
+const fetchObservationsData = async (userId: string, traceId: string) => {
+    const observations = await langfuse.fetchObservations({
         userId,
         traceId,
     });
@@ -54,9 +55,43 @@ const processObservations = (
     const llmCallCount: Array<number> = Array(modelNumber).fill(0);
 
     for (const observation of observations) {
-        // 가장 최근 것 부터 처리
         if (observation.type === 'GENERATION') {
             const modelIndex = modelNames.indexOf(observation.model);
+            if (modelIndex !== -1) {
+                llmLatency[modelIndex].push(
+                    parseFloat(
+                        (Math.round(observation.latency) / 1000).toFixed(2),
+                    ),
+                ); // ms -> s
+                llmStartTime[modelIndex].push(
+                    parseFloat(
+                        (
+                            (new Date(observation.startTime).getTime() -
+                                new Date(startTime).getTime()) /
+                            1000
+                        ) // ms -> s
+                            .toFixed(2),
+                    ),
+                );
+                llmEndTime[modelIndex].push(
+                    parseFloat(
+                        (
+                            (new Date(observation.endTime).getTime() -
+                                new Date(startTime).getTime()) /
+                            1000
+                        ) // ms -> s
+                            .toFixed(2),
+                    ),
+                );
+                llmInputTokenCount[modelIndex].push(observation.promptTokens);
+                llmOutputTokenCount[modelIndex].push(
+                    observation.completionTokens,
+                );
+                llmToktalTokenCount[modelIndex].push(observation.totalTokens);
+                llmCallCount[modelIndex] += 1;
+            }
+        } else if (observation.type === 'SPAN') {
+            const modelIndex = modelNames.indexOf('other');
             if (modelIndex !== -1) {
                 llmLatency[modelIndex].push(
                     parseFloat(
@@ -107,7 +142,6 @@ const processObservations = (
 const createCombinedArray = (
     arr1: Array<Array<number>>,
     arr2: Array<Array<number>>,
-    arr3: Array<Array<number>>,
     modelNames: Array<string>,
 ) => {
     return arr1.reduce<LlmType>((acc, subArray, i) => {
@@ -116,7 +150,7 @@ const createCombinedArray = (
             if (!acc[key]) {
                 acc[key] = [];
             }
-            acc[key].push([value, arr2[i][j], arr3[i][j]]);
+            acc[key].push([value, arr2[i][j]]);
         });
         return acc;
     }, {});
@@ -126,16 +160,32 @@ export async function GET(
     request: NextRequest,
     { params }: { params: Promise<{ slug: string }> },
 ) {
+    const { slug } = await params;
+
+    // 프론트엔드에서 langfuse API 사용하기 위함
+    if (slug === 'info') {
+        return NextResponse.json(
+            {
+                publicKey: process.env.LANGFUSE_PUBLIC_KEY || '',
+                secretKey: process.env.LANGFUSE_SECRET_KEY || '',
+                baseUrl: process.env.LANGFUSE_BASE_URL || '',
+            },
+            { status: 200 },
+        );
+    }
+
     const searchParams: URLSearchParams = request.nextUrl.searchParams;
-    const name: string = searchParams.get('name') || 'RUNE';
+    const sessionId: string = searchParams.get('sessionId') || 'LGCNS';
     const userId: string = searchParams.get('userId') || 'woongsik';
-    const specificTraceId: string | null = searchParams.get('traceId');
+    const specificTraceId: string = searchParams.get('traceId') || '';
+    const name: string = searchParams.get('name') || 'RUNE';
 
     try {
-        const traceSelected: any = await fetchTraceData(
-            name,
+        const traceSelected: Record<string, any> = await fetchTraceData(
+            sessionId,
             userId,
             specificTraceId,
+            name,
         );
 
         if (!traceSelected) {
@@ -147,22 +197,24 @@ export async function GET(
 
         /* 💥 모델 이름 얻기 💥*/
         let modelNames: Array<string> = [];
-        const observations: Array<any> = await fetchObservationsData(
+        const observations = await fetchObservationsData(
             userId,
             traceSelected.id,
         );
         for (const observation of observations) {
             if (observation.type === 'GENERATION') {
-                // GENERATION이 LLM 사용하는 부분
+                // GENERATION이 LLM 사용하는 부분 - 고정된 값
                 if (
                     observation.model &&
                     !modelNames.includes(observation.model)
                 ) {
                     modelNames.push(observation.model);
                 }
+            } else if (observation.type === 'SPAN') {
+                if (!modelNames.includes('other')) modelNames.push('other');
             }
         }
-        const startTime: string = traceSelected.createdAt;
+        const startTime: string = traceSelected.timestamp;
         const {
             llmLatency,
             llmStartTime,
@@ -172,14 +224,12 @@ export async function GET(
             llmToktalTokenCount,
             llmCallCount,
         } = processObservations(observations, modelNames, startTime);
-        const { slug } = await params;
 
         switch (slug) {
             case 'time':
                 const llmTimeData: LlmType = createCombinedArray(
                     llmStartTime,
                     llmEndTime,
-                    llmLatency,
                     modelNames,
                 );
                 return NextResponse.json(llmTimeData, {
@@ -189,7 +239,6 @@ export async function GET(
                 const llmTokenData: LlmType = createCombinedArray(
                     llmStartTime,
                     llmEndTime,
-                    llmToktalTokenCount,
                     modelNames,
                 );
                 return NextResponse.json(llmTokenData, { status: 200 });
