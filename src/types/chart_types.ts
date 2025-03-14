@@ -7,6 +7,7 @@ export interface GraphProps {
     name?: string;
     userId?: string;
     traceId?: string;
+    sessionId?: string;
 }
 
 export interface ChartProps<T = ApexOptions['series'], U = any> {
