@@ -9,12 +9,12 @@ const ReactApexChart = dynamic(() => import('react-apexcharts'), {
     ssr: false,
 }); // browser에서만 렌더링해야하므로 ssr을 끔
 
-const defaultChartOptions = (fontSize: number) => ({
+const defaultChartOptions = (titlefontSize: number) => ({
     title: {
         text: '🦾 Token TimeLine 🦾',
         align: 'center',
         style: {
-            fontSize: `${fontSize}px`,
+            fontSize: `${titlefontSize}px`,
             fontWeight: 'bold',
             color: '#FFFFFF',
         },
@@ -150,7 +150,7 @@ Type 'any' is not assignable to type 'never'.
 // 컴포넌트는 대문자
 export default function Token({
     height = 640,
-    fontSize = 28,
+    titlefontSize = 28,
     name = '',
     userId = '',
     traceId = '',
@@ -158,7 +158,7 @@ export default function Token({
 }: GraphProps) {
     const [state, setState] = useState<ChartProps>({
         series: [],
-        options: defaultChartOptions(fontSize),
+        options: defaultChartOptions(titlefontSize),
     });
 
     useEffect(() => {
