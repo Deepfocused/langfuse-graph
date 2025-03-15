@@ -25,7 +25,7 @@ const defaultChartOptions = (titlefontSize: number) => ({
             offsetX: 25,
             offsetY: 0,
         },
-        type: 'bar',
+        type: 'donut',
         foreColor: '#FFFFFF',
         dropShadow: {
             enabled: true,
@@ -33,27 +33,28 @@ const defaultChartOptions = (titlefontSize: number) => ({
             top: 0,
             left: 0,
             blur: 21,
-            opacity: 0.7,
+            opacity: 0.21,
         },
     },
     // colors: ['#69d2e7', '#FF4560'],
-    plotOptions: {
-        bar: {
-            barHeight: '50%',
-            distributed: true,
-            // horizontal: false,
-            dataLabels: {
-                position: 'top',
-            },
-        },
-    },
+    plotOptions: {},
     dataLabels: {
         enabled: true,
         style: {
             fontSize: '14px',
             colors: ['#FFFFFF'],
         },
-        offsetY: -18,
+        formatter(val: any, opts: any) {
+            const name = opts.w.globals.labels[opts.seriesIndex];
+            return [
+                val.toFixed(1) +
+                    '%' +
+                    `(${opts.w.globals.series[opts.seriesIndex]})`,
+            ];
+        },
+    },
+    fill: {
+        type: 'gradient',
     },
     legend: {
         show: true,
@@ -61,49 +62,6 @@ const defaultChartOptions = (titlefontSize: number) => ({
         position: 'top',
         horizontalAlign: 'center',
         fontSize: '16px',
-    },
-    fill: {
-        type: 'solid',
-        opacity: 1,
-    },
-    xaxis: {
-        labels: {
-            show: true,
-            style: {
-                fontSize: '14px',
-            },
-        },
-        title: {
-            text: '🗽 Model 🗽',
-            offsetY: 0,
-            style: {
-                fontSize: '16px',
-            },
-        },
-    },
-    yaxis: {
-        labels: {
-            show: true,
-            style: {
-                fontSize: '14px',
-            },
-            formatter: (val: number): number => Math.round(val),
-        },
-    },
-    grid: {
-        xaxis: {
-            lines: {
-                show: false,
-            },
-        },
-        yaxis: {
-            lines: {
-                show: true,
-            },
-        },
-    },
-    tooltip: {
-        theme: 'dark',
     },
 });
 
@@ -156,11 +114,9 @@ export default function Call({
 
                     setState((prevState) => ({
                         ...prevState,
-                        series: [{ name: 'Call Count', data }],
+                        series: data,
                         options: {
-                            xaxis: {
-                                categories: axisCategories,
-                            },
+                            labels: axisCategories,
                         },
                     }));
                 }
@@ -178,7 +134,7 @@ export default function Call({
             className="mx-8 my-6"
             options={state.options}
             series={state.series}
-            type="bar"
+            type="donut"
             height={height}
         />
     );
