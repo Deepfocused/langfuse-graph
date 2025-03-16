@@ -61,7 +61,7 @@ const defaultChartOptions = (titlefontSize: number) => ({
             fontSize: '14px',
             colors: ['#FFFFFF'],
         },
-        formatter: function (val: any) {
+        formatter: function (val: Array<number>): string {
             return (val[1] - val[0]).toFixed(1) + 's';
         },
     },
@@ -77,19 +77,13 @@ const defaultChartOptions = (titlefontSize: number) => ({
         opacity: 1,
     },
     xaxis: {
+        stepSize: 5,
         labels: {
             show: true,
             style: {
                 fontSize: '14px',
             },
-            formatter: (val: number): number => Math.round(val),
-        },
-        title: {
-            text: '⏳ Time(s) ⌛',
-            offsetY: 10,
-            style: {
-                fontSize: '16px',
-            },
+            // formatter: (val: number): number => val,
         },
     },
     yaxis: {
