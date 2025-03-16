@@ -41,7 +41,7 @@ const defaultChartOptions = (titlefontSize: number) => ({
             top: 0,
             left: 0,
             blur: 21,
-            opacity: 0.7,
+            opacity: 0.21,
         },
         zoom: {
             enabled: false,
