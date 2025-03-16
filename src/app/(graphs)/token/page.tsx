@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import type { GraphProps, ChartProps } from '@/types/chart_types';
-import { transformDataForTime as transformData } from '@/utils/util';
 import dynamic from 'next/dynamic';
 
 const ReactApexChart = dynamic(() => import('react-apexcharts'), {
@@ -26,7 +25,8 @@ const defaultChartOptions = (titlefontSize: number) => ({
             offsetX: 25,
             offsetY: 0,
         },
-        type: 'rangeBar',
+        type: 'bar',
+        stacked: true,
         foreColor: '#FFFFFF',
         dropShadow: {
             enabled: true,
@@ -34,7 +34,7 @@ const defaultChartOptions = (titlefontSize: number) => ({
             top: 0,
             left: 0,
             blur: 21,
-            opacity: 0.7,
+            opacity: 0.21,
         },
         zoom: {
             enabled: false,
@@ -43,9 +43,22 @@ const defaultChartOptions = (titlefontSize: number) => ({
     // colors: ['#69d2e7', '#FF4560'],
     plotOptions: {
         bar: {
-            barHeight: '30%',
-            horizontal: true,
-            rangeBarGroupRows: true,
+            columnWidth: '60%',
+            horizontal: false,
+            borderRadius: 5,
+            borderRadiusApplication: 'end', // 'around', 'end'
+            borderRadiusWhenStacked: 'last', // 'all', 'last'
+            dataLabels: {
+                position: 'top',
+                total: {
+                    enabled: true,
+                    style: {
+                        fontSize: '15px',
+                        fontWeight: 900,
+                        color: '#cfffff',
+                    },
+                },
+            },
         },
     },
     dataLabels: {
@@ -53,9 +66,6 @@ const defaultChartOptions = (titlefontSize: number) => ({
         style: {
             fontSize: '14px',
             colors: ['#FFFFFF'],
-        },
-        formatter: function (val: any) {
-            return (val[1] - val[0]).toFixed(2) + 's';
         },
     },
     legend: {
@@ -75,19 +85,17 @@ const defaultChartOptions = (titlefontSize: number) => ({
             style: {
                 fontSize: '14px',
             },
-            formatter: (val: number): number => Math.round(val),
-        },
-        title: {
-            text: '⏳ Time(s) ⌛',
-            offsetY: 10,
-            style: {
-                fontSize: '16px',
+            formatter: (val: Array<number>): string => {
+                // Number(val[0]) 이렇게 안해주면 오류 발생
+                const startTime: number = Number(val[0]);
+                const endTime: number = Number(val[1]);
+                return `${startTime.toFixed(1)}~${endTime.toFixed(1)}s`;
             },
         },
     },
     yaxis: {
         labels: {
-            show: false,
+            show: true,
             style: {
                 fontSize: '14px',
             },
@@ -96,48 +104,17 @@ const defaultChartOptions = (titlefontSize: number) => ({
     grid: {
         xaxis: {
             lines: {
-                show: true,
+                show: false,
             },
         },
         yaxis: {
             lines: {
-                show: false,
+                show: true,
             },
         },
     },
     tooltip: {
         theme: 'dark',
-        custom: function (opts: any) {
-            const w = opts.ctx.w;
-            let ylabel = '';
-            if (
-                w.config.series[opts.seriesIndex].data &&
-                w.config.series[opts.seriesIndex].data[opts.dataPointIndex]
-            ) {
-                ylabel =
-                    w.config.series[opts.seriesIndex].data[opts.dataPointIndex]
-                        .x;
-            }
-            let seriesName = w.config.series[opts.seriesIndex].name
-                ? w.config.series[opts.seriesIndex].name
-                : '';
-            const color = w.globals.colors[opts.seriesIndex];
-
-            return (
-                '<div class="apexcharts-tooltip-rangebar">' +
-                '<div> <span class="series-name" style="color: ' +
-                color +
-                '">' +
-                (seriesName ? seriesName : '') +
-                '</span></div>' +
-                '<div> <span class="category">' +
-                ylabel +
-                ' </span> <span class="value start-value">' +
-                (opts.y2 - opts.y1) +
-                '</span></div>' +
-                '</div>'
-            );
-        },
     },
 });
 
@@ -177,7 +154,7 @@ export default function Token({
                         ...prevState,
                     }));
                 } else {
-                    let result;
+                    let result: { [x: string]: any } = {};
                     try {
                         result = await response.json();
                     } catch (jsonError) {
@@ -185,10 +162,38 @@ export default function Token({
                             ...prevState,
                         }));
                     }
-                    const transformedData = transformData(result, 'Token');
+
+                    console.log(result['modelandcount']);
+                    // const groups = result['modelandcount'].map(
+                    //     (item: { model: string }) => item.model,
+                    // );
                     setState((prevState) => ({
                         ...prevState,
-                        series: transformedData,
+                        series: [
+                            {
+                                name: 'input token',
+                                data: result['inputtoken'],
+                            },
+                            {
+                                name: 'output token',
+                                data: result['outputtoken'],
+                            },
+                        ],
+                        options: {
+                            xaxis: {
+                                categories: result['timeline'],
+                            },
+                            group: {
+                                style: {
+                                    fontSize: '10px',
+                                    fontWeight: 700,
+                                },
+                                groups: [
+                                    { title: 'power', cols: 1 },
+                                    { title: '2020', cols: 3 },
+                                ],
+                            },
+                        },
                     }));
                 }
             } catch (error) {
@@ -205,7 +210,7 @@ export default function Token({
             className="mx-8 my-6"
             options={state.options}
             series={state.series}
-            type="rangeBar"
+            type="bar"
             height={height}
         />
     );
