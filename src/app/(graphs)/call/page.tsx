@@ -36,15 +36,28 @@ const defaultChartOptions = (titlefontSize: number) => ({
             opacity: 0.21,
         },
     },
+    plotOptions: {
+        pie: {
+            customScale: 1,
+            donut: {
+                size: '60%',
+                labels: {
+                    show: true,
+                    total: {
+                        show: true,
+                    },
+                },
+            },
+        },
+    },
     // colors: ['#69d2e7', '#FF4560'],
-    plotOptions: {},
     dataLabels: {
         enabled: true,
         style: {
             fontSize: '14px',
             colors: ['#FFFFFF'],
         },
-        formatter(val: any, opts: any) {
+        formatter(val: number, opts: any) {
             const name = opts.w.globals.labels[opts.seriesIndex];
             return [
                 val.toFixed(1) +
