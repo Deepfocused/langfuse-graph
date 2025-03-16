@@ -50,8 +50,6 @@ const processObservations = (
         initializeArray(modelNumber);
     const llmOutputTokenCount: Array<Array<number>> =
         initializeArray(modelNumber);
-    const llmToktalTokenCount: Array<Array<number>> =
-        initializeArray(modelNumber);
     const llmCallCount: Array<number> = Array(modelNumber).fill(0);
 
     for (const observation of observations) {
@@ -87,7 +85,6 @@ const processObservations = (
                 llmOutputTokenCount[modelIndex].push(
                     observation.completionTokens,
                 );
-                llmToktalTokenCount[modelIndex].push(observation.totalTokens);
                 llmCallCount[modelIndex] += 1;
             }
         } else if (observation.type === 'SPAN') {
@@ -122,7 +119,6 @@ const processObservations = (
                 llmOutputTokenCount[modelIndex].push(
                     observation.completionTokens,
                 );
-                llmToktalTokenCount[modelIndex].push(observation.totalTokens);
                 llmCallCount[modelIndex] += 1;
             }
         }
@@ -134,7 +130,6 @@ const processObservations = (
         llmEndTime,
         llmInputTokenCount,
         llmOutputTokenCount,
-        llmToktalTokenCount,
         llmCallCount,
     };
 };
@@ -156,10 +151,40 @@ const createCombinedArray = (
     }, {});
 };
 
+// 각 배열의 내부 배열을 오름차순으로 정렬하고, 정렬된 인덱스를 반환
+const sortWithIndices = (array: Array<number>) => {
+    const indexedArray = array.map((value, index) => ({ value, index }));
+    indexedArray.sort((a, b) => a.value - b.value);
+    return indexedArray.map((item) => item.index);
+};
+
+// 주어진 인덱스 순서에 따라 배열을 재정렬
+const reorderArray = (array: Array<number>, indices: Array<number>) => {
+    return indices.map((index) => array[index]);
+};
+
+// 배열 병합 [a,b,c],[d,e,f] => [[a,d],[b,e],[c,f]]
+const mergeArrays = (
+    arr1: Array<Array<number>>,
+    arr2: Array<Array<number>>,
+) => {
+    return arr1.map((subArray, i) =>
+        subArray.map((_, j) => [arr1[i][j], arr2[i][j]]),
+    );
+};
+
+// 2차원 배열을 1차원 배열로 변환
+const flattenArray = (arrays: Array<Array<number>>) => {
+    return arrays.reduce((acc, subArray) => acc.concat(subArray), []);
+};
+
 export async function GET(
     request: NextRequest,
     { params }: { params: Promise<{ slug: string }> },
 ) {
+    const traces = await langfuse.fetchTraces();
+    // console.log(traces);
+
     const { slug } = await params;
 
     // 프론트엔드에서 langfuse API 사용하기 위함
@@ -221,7 +246,6 @@ export async function GET(
             llmEndTime,
             llmInputTokenCount,
             llmOutputTokenCount,
-            llmToktalTokenCount,
             llmCallCount,
         } = processObservations(observations, modelNames, startTime);
 
@@ -236,12 +260,66 @@ export async function GET(
                     status: 200,
                 });
             case 'token':
-                const llmTokenData: LlmType = createCombinedArray(
-                    llmStartTime,
-                    llmEndTime,
-                    modelNames,
+                const exception = modelNames.indexOf('other');
+                llmStartTime.splice(exception, 1);
+                llmEndTime.splice(exception, 1);
+                llmInputTokenCount.splice(exception, 1);
+                llmOutputTokenCount.splice(exception, 1);
+                modelNames.splice(exception, 1);
+
+                // 각 내부 배열을 정렬하고, 다른 배열도 동일한 순서로 정렬
+                const sortedllmStartTime = llmStartTime.map((subArray) => {
+                    const indices = sortWithIndices(subArray);
+                    return reorderArray(subArray, indices);
+                });
+
+                const sortedllmEndTime = llmEndTime.map((subArray, i) => {
+                    const indices = sortWithIndices(llmStartTime[i]);
+                    return reorderArray(subArray, indices);
+                });
+
+                const sortedllmInputTokenCount = llmInputTokenCount.map(
+                    (subArray, i) => {
+                        const indices = sortWithIndices(llmStartTime[i]);
+                        return reorderArray(subArray, indices);
+                    },
                 );
-                return NextResponse.json(llmTokenData, { status: 200 });
+
+                const sortedllmOutputTokenCount = llmOutputTokenCount.map(
+                    (subArray, i) => {
+                        const indices = sortWithIndices(llmStartTime[i]);
+                        return reorderArray(subArray, indices);
+                    },
+                );
+                //llmStartTime, llmEndTime 병합하여 새로운 배열 생성
+                const mergedLlmTime = mergeArrays(
+                    sortedllmStartTime,
+                    sortedllmEndTime,
+                );
+
+                const flattenedLlmInputTokenCount = flattenArray(
+                    sortedllmInputTokenCount,
+                );
+                const flattenedllmOutputTokenCount = flattenArray(
+                    sortedllmOutputTokenCount,
+                );
+
+                const groupedModelNumber = modelNames.reduce<
+                    Record<string, number>
+                >((acc, value, index) => {
+                    acc[value] = llmStartTime[index].length;
+                    return acc;
+                }, {});
+
+                return NextResponse.json(
+                    {
+                        timeline: mergedLlmTime,
+                        inputtoken: flattenedLlmInputTokenCount,
+                        outputtoken: flattenedllmOutputTokenCount,
+                        modelandcount: groupedModelNumber,
+                    },
+                    { status: 200 },
+                );
             case 'call':
                 const llmCallCountData = modelNames.reduce<LlmType<number>>(
                     (result, name, index) => {
