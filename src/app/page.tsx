@@ -8,7 +8,7 @@ import Summary from '@/app/(graphs)/summary/page';
 import { motion } from 'framer-motion';
 
 export default function Home() {
-    const height = 300;
+    const height = 410;
     const titlefontSize = 20;
     return (
         <>
