@@ -295,7 +295,7 @@ export async function GET(
                 const mergedLlmTime = mergeArrays(
                     sortedllmStartTime,
                     sortedllmEndTime,
-                );
+                ).flat();
 
                 const flattenedLlmInputTokenCount = flattenArray(
                     sortedllmInputTokenCount,
