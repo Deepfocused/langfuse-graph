@@ -304,12 +304,9 @@ export async function GET(
                     sortedllmOutputTokenCount,
                 );
 
-                const groupedModelNumber = modelNames.reduce<
-                    Record<string, number>
-                >((acc, value, index) => {
-                    acc[value] = llmStartTime[index].length;
-                    return acc;
-                }, {});
+                const groupedModelNumber = modelNames.map((value, index) => {
+                    return { title: value, cols: llmStartTime[index].length };
+                });
 
                 return NextResponse.json(
                     {
