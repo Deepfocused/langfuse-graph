@@ -49,13 +49,13 @@ const defaultChartOptions = (titlefontSize: number) => ({
             borderRadiusApplication: 'end', // 'around', 'end'
             borderRadiusWhenStacked: 'last', // 'all', 'last'
             dataLabels: {
-                position: 'top',
+                position: 'center',
                 total: {
                     enabled: true,
                     style: {
                         fontSize: '15px',
                         fontWeight: 900,
-                        color: '#cfffff',
+                        color: '#ffffff',
                     },
                 },
             },
