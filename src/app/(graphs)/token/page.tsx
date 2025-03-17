@@ -163,10 +163,6 @@ export default function Token({
                         }));
                     }
 
-                    console.log(result['modelandcount']);
-                    // const groups = result['modelandcount'].map(
-                    //     (item: { model: string }) => item.model,
-                    // );
                     setState((prevState) => ({
                         ...prevState,
                         series: [
@@ -182,16 +178,13 @@ export default function Token({
                         options: {
                             xaxis: {
                                 categories: result['timeline'],
-                            },
-                            group: {
-                                style: {
-                                    fontSize: '10px',
-                                    fontWeight: 700,
+                                group: {
+                                    style: {
+                                        fontSize: '14px',
+                                        fontWeight: 700,
+                                    },
+                                    groups: result['modelandcount'],
                                 },
-                                groups: [
-                                    { title: 'power', cols: 1 },
-                                    { title: '2020', cols: 3 },
-                                ],
                             },
                         },
                     }));
