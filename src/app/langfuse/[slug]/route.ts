@@ -61,26 +61,33 @@ const processObservations = (
                         (Math.round(observation.latency) / 1000).toFixed(2),
                     ),
                 ); // ms -> s
-                llmStartTime[modelIndex].push(
-                    parseFloat(
-                        (
-                            (new Date(observation.startTime).getTime() -
-                                new Date(startTime).getTime()) /
-                            1000
-                        ) // ms -> s
-                            .toFixed(2),
-                    ),
-                );
-                llmEndTime[modelIndex].push(
-                    parseFloat(
-                        (
-                            (new Date(observation.endTime).getTime() -
-                                new Date(startTime).getTime()) /
-                            1000
-                        ) // ms -> s
-                            .toFixed(2),
-                    ),
-                );
+
+                if (observation.endTime) {
+                    llmStartTime[modelIndex].push(
+                        parseFloat(
+                            (
+                                (new Date(observation.startTime).getTime() -
+                                    new Date(startTime).getTime()) /
+                                1000
+                            ) // ms -> s
+                                .toFixed(2),
+                        ),
+                    );
+                    llmEndTime[modelIndex].push(
+                        parseFloat(
+                            (
+                                (new Date(observation.endTime).getTime() -
+                                    new Date(startTime).getTime()) /
+                                1000
+                            ) // ms -> s
+                                .toFixed(2),
+                        ),
+                    );
+                } else {
+                    llmStartTime[modelIndex].push(0.0);
+                    llmEndTime[modelIndex].push(0.0);
+                }
+
                 llmInputTokenCount[modelIndex].push(observation.promptTokens);
                 llmOutputTokenCount[modelIndex].push(
                     observation.completionTokens,
@@ -95,26 +102,31 @@ const processObservations = (
                         (Math.round(observation.latency) / 1000).toFixed(2),
                     ),
                 ); // ms -> s
-                llmStartTime[modelIndex].push(
-                    parseFloat(
-                        (
-                            (new Date(observation.startTime).getTime() -
-                                new Date(startTime).getTime()) /
-                            1000
-                        ) // ms -> s
-                            .toFixed(2),
-                    ),
-                );
-                llmEndTime[modelIndex].push(
-                    parseFloat(
-                        (
-                            (new Date(observation.endTime).getTime() -
-                                new Date(startTime).getTime()) /
-                            1000
-                        ) // ms -> s
-                            .toFixed(2),
-                    ),
-                );
+                if (observation.endTime) {
+                    llmStartTime[modelIndex].push(
+                        parseFloat(
+                            (
+                                (new Date(observation.startTime).getTime() -
+                                    new Date(startTime).getTime()) /
+                                1000
+                            ) // ms -> s
+                                .toFixed(2),
+                        ),
+                    );
+                    llmEndTime[modelIndex].push(
+                        parseFloat(
+                            (
+                                (new Date(observation.endTime).getTime() -
+                                    new Date(startTime).getTime()) /
+                                1000
+                            ) // ms -> s
+                                .toFixed(2),
+                        ),
+                    );
+                } else {
+                    llmStartTime[modelIndex].push(0.0);
+                    llmEndTime[modelIndex].push(0.0);
+                }
                 llmInputTokenCount[modelIndex].push(observation.promptTokens);
                 llmOutputTokenCount[modelIndex].push(
                     observation.completionTokens,
@@ -183,12 +195,14 @@ export async function GET(
     { params }: { params: Promise<{ slug: string }> },
 ) {
     const traces = await langfuse.fetchTraces();
-    // console.log(traces);
+    console.log(traces.data.length);
 
     const { slug } = await params;
 
-    // 프론트엔드에서 langfuse API 사용하기 위함
+    // 프론트엔드에서 정보를 요청할 때 사용
     if (slug === 'info') {
+        const traces = await langfuse.fetchTraces();
+        // name, userId, traceId, sessionId 반환하기
         return NextResponse.json(
             {
                 publicKey: process.env.LANGFUSE_PUBLIC_KEY || '',
@@ -200,10 +214,11 @@ export async function GET(
     }
 
     const searchParams: URLSearchParams = request.nextUrl.searchParams;
-    const sessionId: string = searchParams.get('sessionId') || 'LGCNS';
-    const userId: string = searchParams.get('userId') || 'woongsik';
     const specificTraceId: string = searchParams.get('traceId') || '';
-    const name: string = searchParams.get('name') || 'RUNE';
+    const sessionId: string = searchParams.get('sessionId') || ''; // || 'LGCNS';
+    const userId: string = searchParams.get('userId') || ''; //  || 'woongsik';
+    const name: string =
+        searchParams.get('name') || 'LG AI Agent_react_state_demo'; // || 'RUNE';
 
     try {
         const traceSelected: Record<string, any> = await fetchTraceData(
