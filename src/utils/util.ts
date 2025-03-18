@@ -1,4 +1,3 @@
-
 import type { LlmType } from '@/types/chart_types';
 // 데이터 변환 함수
 export const transformDataForTime = (data: LlmType, x: string = 'Latency') => {
