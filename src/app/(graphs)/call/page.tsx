@@ -118,6 +118,7 @@ export default function Call({
                     try {
                         result = await response.json();
                     } catch (jsonError) {
+                        console.error('Error fetching json:', jsonError);
                         setState((prevState) => ({
                             ...prevState,
                         }));
@@ -134,6 +135,7 @@ export default function Call({
                     }));
                 }
             } catch (error) {
+                console.error('Error fetching data:', error);
                 setState((prevState) => ({
                     ...prevState,
                 }));
