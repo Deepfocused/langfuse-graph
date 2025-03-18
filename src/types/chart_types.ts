@@ -23,3 +23,13 @@ export interface ChartProps<T = ApexOptions['series'], U = any> {
 export interface LlmType<T = Array<Array<number>>> {
     [key: string]: T;
 }
+
+export interface TraceInfo {
+    name: string | null | undefined;
+    userId: string | null | undefined;
+    sessionId: string | null | undefined;
+}
+
+export interface Infos {
+    [key: string]: TraceInfo;
+}
