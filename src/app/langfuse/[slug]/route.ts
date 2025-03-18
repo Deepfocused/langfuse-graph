@@ -3,7 +3,7 @@
 // https://nextjs.org/docs/app/api-reference/file-conventions/route
 import { type NextRequest, NextResponse } from 'next/server';
 import { Langfuse } from 'langfuse';
-import type { LlmType } from '@/types/chart_types';
+import type { LlmType, Infos } from '@/types/chart_types';
 
 const langfuse = new Langfuse({
     publicKey: process.env.LANGFUSE_PUBLIC_KEY || '',
@@ -194,23 +194,35 @@ export async function GET(
     request: NextRequest,
     { params }: { params: Promise<{ slug: string }> },
 ) {
+    // default 50개만 가져옴
     const traces = await langfuse.fetchTraces();
-    console.log(traces.data.length);
+
+    const infos: Infos = {};
+    for (const trace of traces.data) {
+        infos[trace.id] = {
+            name: trace.name,
+            userId: trace.userId,
+            sessionId: trace.sessionId,
+        };
+    }
+    console.log(infos);
 
     const { slug } = await params;
 
-    // 프론트엔드에서 정보를 요청할 때 사용
+    // 프론트엔드에서 정보를 요청할 때 사용 - name, userId, sessionId, traceId 반환
     if (slug === 'info') {
         const traces = await langfuse.fetchTraces();
+
+        const infos: Infos = {};
+        for (const trace of traces.data) {
+            infos[trace.id] = {
+                name: trace.name,
+                userId: trace.userId,
+                sessionId: trace.sessionId,
+            };
+        }
         // name, userId, traceId, sessionId 반환하기
-        return NextResponse.json(
-            {
-                publicKey: process.env.LANGFUSE_PUBLIC_KEY || '',
-                secretKey: process.env.LANGFUSE_SECRET_KEY || '',
-                baseUrl: process.env.LANGFUSE_BASE_URL || '',
-            },
-            { status: 200 },
-        );
+        return NextResponse.json(infos, { status: 200 });
     }
 
     const searchParams: URLSearchParams = request.nextUrl.searchParams;
