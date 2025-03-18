@@ -12,10 +12,10 @@ const langfuse = new Langfuse({
 });
 
 const fetchTraceData = async (
-    sessionId: string,
-    userId: string,
+    name: string | null,
+    userId: string | null,
+    sessionId: string | null,
     specificTraceId: string,
-    name: string,
 ) => {
     if (specificTraceId) {
         const trace = await langfuse.fetchTrace(specificTraceId);
@@ -26,9 +26,8 @@ const fetchTraceData = async (
     }
 };
 
-const fetchObservationsData = async (userId: string, traceId: string) => {
+const fetchObservationsData = async (traceId: string) => {
     const observations = await langfuse.fetchObservations({
-        userId,
         traceId,
     });
     return observations.data;
@@ -195,7 +194,6 @@ export async function GET(
     { params }: { params: Promise<{ slug: string }> },
 ) {
     // default 50개만 가져옴
-    const traces = await langfuse.fetchTraces();
     const { slug } = await params;
 
     // 프론트엔드에서 정보를 요청할 때 사용 - name, userId, sessionId, traceId 반환
@@ -217,17 +215,17 @@ export async function GET(
 
     const searchParams: URLSearchParams = request.nextUrl.searchParams;
     const specificTraceId: string = searchParams.get('traceId') || '';
-    const sessionId: string = searchParams.get('sessionId') || ''; // || 'LGCNS';
-    const userId: string = searchParams.get('userId') || ''; //  || 'woongsik';
-    const name: string =
-        searchParams.get('name') || 'LG AI Agent_react_state_demo'; // || 'RUNE';
+    const sessionId: string | null = searchParams.get('sessionId') || null;
+    const userId: string | null = searchParams.get('userId') || null;
+    const name: string | null = searchParams.get('name') || null;
 
     try {
+        // specificTraceId가 주어지지 않으면, 가장 최근것 불러옴 -
         const traceSelected: Record<string, any> = await fetchTraceData(
-            sessionId,
-            userId,
-            specificTraceId,
             name,
+            userId,
+            sessionId,
+            specificTraceId,
         );
 
         if (!traceSelected) {
@@ -239,10 +237,7 @@ export async function GET(
 
         /* 💥 모델 이름 얻기 💥*/
         let modelNames: Array<string> = [];
-        const observations = await fetchObservationsData(
-            userId,
-            traceSelected.id,
-        );
+        const observations = await fetchObservationsData(traceSelected.id);
         for (const observation of observations) {
             if (observation.type === 'GENERATION') {
                 // GENERATION이 LLM 사용하는 부분 - 고정된 값
