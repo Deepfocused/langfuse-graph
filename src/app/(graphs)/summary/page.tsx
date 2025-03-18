@@ -57,6 +57,9 @@ const defaultChartOptions = (titlefontSize: number) => ({
             colors: ['#FFFFFF'],
         },
         offsetY: -18,
+        formatter: function (val: number) {
+            return val.toFixed();
+        },
     },
     stroke: {
         show: true,
