@@ -1,6 +1,11 @@
 import { ApexOptions } from 'apexcharts';
 
-// 사용 x
+export interface ContentsProps {
+    height: number;
+    titlefontSize: number;
+    traceId: string;
+}
+
 export interface GraphProps {
     height?: number;
     titlefontSize?: number;
