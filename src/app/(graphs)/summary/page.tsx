@@ -1,4 +1,5 @@
 'use client';
+
 import { useEffect, useState } from 'react';
 import type { GraphProps, ChartProps } from '@/types/chart_types';
 import { transformDataForSummary as transformData } from '@/utils/util';
