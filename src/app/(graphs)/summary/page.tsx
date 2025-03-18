@@ -156,6 +156,7 @@ export default function Summary({
                     try {
                         result = await response.json();
                     } catch (jsonError) {
+                        console.error('Error fetching json:', jsonError);
                         setState((prevState) => ({
                             ...prevState,
                         }));
@@ -177,6 +178,7 @@ export default function Summary({
                     }));
                 }
             } catch (error) {
+                console.error('Error fetching data:', error);
                 setState((prevState) => ({
                     ...prevState,
                 }));
