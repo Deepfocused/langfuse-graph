@@ -214,7 +214,7 @@ export async function GET(
                 if (!modelNames.includes('other')) modelNames.push('other');
             }
         }
-        // ['other', 'llm model'...] -> ['llm model', 'other']
+        // ['other', 'llm model', ...] -> ['llm model', ...,  'other']
         modelNames.reverse();
 
         const startTime: string = traceSelected.timestamp;
