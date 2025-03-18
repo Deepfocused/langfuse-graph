@@ -44,13 +44,20 @@ export default function Home() {
     // }, [info]);
 
     return (
-        <>
+        <main
+            //  h-[30rem]     브라우저 너비 640px 미만일 때
+            //  sm:h-[35rem]  브라우저 너비 640px 이상일 때
+            //  lg:h-[40rem]  브라우저 너비 1024px 이상일 때
+            //  xl:h-[45rem]  브라우저 너비 1280px 이상일 때
+            //  2xl:h-[50rem] 브라우저 너비 1536px 이상일 때
+            className="graphs-scrollbar overflow-y-scroll h-[30rem] sm:h-[35rem] lg:h-[40rem] xl:h-[45rem] 2xl:h-[50rem]"
+        >
             {/* name, userId, traceId select box*/}
             <Contents
                 height={height}
                 titlefontSize={titlefontSize}
                 traceId={traceId}
             />
-        </>
+        </main>
     );
 }
