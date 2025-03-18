@@ -196,21 +196,11 @@ export async function GET(
 ) {
     // default 50개만 가져옴
     const traces = await langfuse.fetchTraces();
-
-    const infos: Infos = {};
-    for (const trace of traces.data) {
-        infos[trace.id] = {
-            name: trace.name,
-            userId: trace.userId,
-            sessionId: trace.sessionId,
-        };
-    }
-    console.log(infos);
-
     const { slug } = await params;
 
     // 프론트엔드에서 정보를 요청할 때 사용 - name, userId, sessionId, traceId 반환
     if (slug === 'info') {
+        // default 값 : 50개만 가져옴
         const traces = await langfuse.fetchTraces();
 
         const infos: Infos = {};
