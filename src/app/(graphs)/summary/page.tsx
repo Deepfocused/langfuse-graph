@@ -122,9 +122,9 @@ Type 'any' is not assignable to type 'never'.
 export default function Summary({
     height = 640,
     titlefontSize = 28,
-    name = '',
-    userId = '',
-    sessionId = '',
+    // name = '',
+    // userId = '',
+    // sessionId = '',
     traceId = '',
 }: GraphProps) {
     const [state, setState] = useState<ChartProps>({
@@ -139,9 +139,9 @@ export default function Summary({
                     '/langfuse/summary',
                     window.location.origin,
                 );
-                if (name) url.searchParams.append('name', name);
-                if (userId) url.searchParams.append('userId', userId);
-                if (sessionId) url.searchParams.append('sessionId', sessionId);
+                // if (name) url.searchParams.append('name', name);
+                // if (userId) url.searchParams.append('userId', userId);
+                // if (sessionId) url.searchParams.append('sessionId', sessionId);
                 if (traceId) url.searchParams.append('traceId', traceId);
 
                 const response = await fetch(url.toString());
@@ -182,7 +182,8 @@ export default function Summary({
             }
         };
         fetchData();
-    }, [name, userId, traceId, sessionId]);
+        // }, [name, userId, traceId, sessionId]);
+    }, [traceId]);
 
     return (
         <ReactApexChart
