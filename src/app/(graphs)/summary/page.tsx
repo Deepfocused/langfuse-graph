@@ -121,8 +121,8 @@ export default function Summary({
     titlefontSize = 28,
     name = '',
     userId = '',
-    traceId = '',
     sessionId = '',
+    traceId = '',
 }: GraphProps) {
     const [state, setState] = useState<ChartProps>({
         series: [],
@@ -137,9 +137,9 @@ export default function Summary({
                     window.location.origin,
                 );
                 if (name) url.searchParams.append('name', name);
-                if (traceId) url.searchParams.append('traceId', traceId);
                 if (userId) url.searchParams.append('userId', userId);
                 if (sessionId) url.searchParams.append('sessionId', sessionId);
+                if (traceId) url.searchParams.append('traceId', traceId);
 
                 const response = await fetch(url.toString());
 
