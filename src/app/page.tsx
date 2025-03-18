@@ -22,7 +22,10 @@ export default function Home() {
                     let result;
                     try {
                         result = await response.json();
-                    } catch (jsonError) {}
+                    } catch (jsonError) {
+                        console.error('Error fetching json:', jsonError);
+                        setInfo({});
+                    }
                     setInfo(result);
                 }
             } catch (error) {
