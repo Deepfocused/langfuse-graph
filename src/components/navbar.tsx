@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -17,7 +19,6 @@ const Navbar = () => {
         else setActive('');
     }, [pathname]);
 
-    //nextjs.org/docs/app/api-reference/components/link#replace
     return (
         <>
             <div className="mx-4 my-2 flex items-center justify-between max-[559px]:hidden">
