@@ -48,12 +48,12 @@ export default function RootLayout({
                 className={`${geistSans.className} antialiased body-scrollbar container mx-auto cursor-default`}
             >
                 <div className="mx-8 my-4">
-                    <div className="text-center">
+                    <header className="text-center">
                         <p className="text-3xl font-bold">Langfuse-graph</p>
                         <p className="mt-4 text-base text-gray-300">
                             😃 Agent Evaluation 😃
                         </p>
-                    </div>
+                    </header>
                     <div className="my-4">
                         <div className="rounded-l-xl rounded-tr-xl border-solid border-2 border-blue-300 shadow-2xl shadow-blue-300">
                             <Navbar />
