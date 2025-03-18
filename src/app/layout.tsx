@@ -56,23 +56,8 @@ export default function RootLayout({
                     </div>
                     <div className="my-4">
                         <div className="rounded-l-xl rounded-tr-xl border-solid border-2 border-blue-300 shadow-2xl shadow-blue-300">
-                            {/* 
-                            - sm: 640px 이상
-                            - lg: 1024px 이상
-                            - xl: 1280px 이상
-                            - 2xl: 1536px 이상
-                            */}
-                            <main
-                                className="graphs-scrollbar overflow-y-scroll
-                             h-[30rem]  /* 기본 - 브라우저 너비 640px 미만일 때 */
-                             sm:h-[35rem]  /* 브라우저 너비 640px 이상일 때 */
-                             lg:h-[40rem]  /* 브라우저 너비 1024px 이상일 때 */
-                             xl:h-[45rem]  /* 브라우저 너비 1280px 이상일 때 */
-                             2xl:h-[50rem]  /* 브라우저 너비 1536px 이상일 때 */"
-                            >
-                                <Navbar />
-                                {children}
-                            </main>
+                            <Navbar />
+                            {children}
                         </div>
                     </div>
                 </div>
