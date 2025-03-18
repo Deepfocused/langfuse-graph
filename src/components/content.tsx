@@ -4,13 +4,9 @@ import Token from '@/app/(graphs)/token/page';
 import Call from '@/app/(graphs)/call/page';
 import Summary from '@/app/(graphs)/summary/page';
 import { motion } from 'framer-motion';
-import { ContentsProps } from '@/types/chart_types';
+import type { ContentsProps } from '@/types/chart_types';
 
-const Contents = ({
-    height = 410,
-    titlefontSize = 20,
-    traceId = '',
-}: ContentsProps) => {
+const Contents = ({ height = 410, titlefontSize = 20 }: ContentsProps) => {
     return (
         <>
             <div className="mt-2 mx-4 grid gap-6 md:grid-cols-2">
@@ -29,11 +25,7 @@ const Contents = ({
                         scroll={false}
                         prefetch={true}
                     >
-                        <Time
-                            height={height}
-                            titlefontSize={titlefontSize}
-                            traceId={traceId}
-                        />
+                        <Time height={height} titlefontSize={titlefontSize} />
                     </Link>
                 </motion.div>
                 <motion.div
@@ -51,11 +43,7 @@ const Contents = ({
                         scroll={false}
                         prefetch={true}
                     >
-                        <Token
-                            height={height}
-                            titlefontSize={titlefontSize}
-                            traceId={traceId}
-                        />
+                        <Token height={height} titlefontSize={titlefontSize} />
                     </Link>
                 </motion.div>
             </div>
@@ -75,11 +63,7 @@ const Contents = ({
                         scroll={false}
                         prefetch={true}
                     >
-                        <Call
-                            height={height}
-                            titlefontSize={titlefontSize}
-                            traceId={traceId}
-                        />
+                        <Call height={height} titlefontSize={titlefontSize} />
                     </Link>
                 </motion.div>
                 <motion.div
@@ -100,7 +84,6 @@ const Contents = ({
                         <Summary
                             height={height}
                             titlefontSize={titlefontSize}
-                            traceId={traceId}
                         />
                     </Link>
                 </motion.div>

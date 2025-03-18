@@ -1,3 +1,4 @@
+import { InfoProvider } from '@/context/InfoContext';
 import type { Metadata, Viewport } from 'next';
 import { Geist } from 'next/font/google';
 import Navbar from '@/components/navbar';
@@ -47,20 +48,23 @@ export default function RootLayout({
             <body
                 className={`${geistSans.className} antialiased body-scrollbar container mx-auto cursor-default`}
             >
-                <div className="mx-8 my-4">
-                    <header className="text-center">
-                        <p className="text-3xl font-bold">Langfuse-graph</p>
-                        <p className="mt-4 text-base text-gray-300">
-                            😃 Agent Evaluation 😃
-                        </p>
-                    </header>
-                    <div className="my-4">
-                        <div className="rounded-l-xl rounded-tr-xl border-solid border-2 border-blue-300 shadow-2xl shadow-blue-300">
-                            <Navbar />
-                            {children}
+                <InfoProvider>
+                    <div className="mx-8 my-4">
+                        <header className="text-center">
+                            <p className="text-3xl font-bold">Langfuse-graph</p>
+                            <p className="mt-4 text-base text-gray-300">
+                                😃 Agent Evaluation 😃
+                            </p>
+                        </header>
+
+                        <div className="my-4">
+                            <div className="rounded-l-xl rounded-tr-xl border-solid border-2 border-blue-300 shadow-2xl shadow-blue-300">
+                                <Navbar />
+                                {children}
+                            </div>
                         </div>
                     </div>
-                </div>
+                </InfoProvider>
             </body>
         </html>
     );

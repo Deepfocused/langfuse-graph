@@ -1,18 +1,8 @@
 import { ApexOptions } from 'apexcharts';
 
 export interface ContentsProps {
-    height: number;
-    titlefontSize: number;
-    traceId: string;
-}
-
-export interface GraphProps {
     height?: number;
     titlefontSize?: number;
-    name?: string;
-    userId?: string;
-    traceId?: string;
-    sessionId?: string;
 }
 
 export interface ChartProps<T = ApexOptions['series'], U = any> {
@@ -37,4 +27,17 @@ export interface TraceInfo {
 
 export interface Infos {
     [key: string]: TraceInfo;
+}
+
+export interface InfoContextType {
+    name: string;
+    setName: (value: string) => void;
+    userId: string;
+    setUserId: (value: string) => void;
+    sessionId: string;
+    setSessionId: (value: string) => void;
+    traceId: string;
+    setTraceId: (value: string) => void;
+    info: Infos;
+    setInfo: (value: Infos) => void;
 }
