@@ -214,8 +214,8 @@ export default function Token({
     return (
         <>
             {showInfo && (
-                <div className="flex items-center justify-center gap-4 mb-2">
-                    <span className="rounded-md bg-gray-100 px-1 py-1 text-sm font-medium text-gray-700 ring-4 ring-gray-700/50">
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-2">
+                    <span className="ml-4 rounded-md bg-gray-100 px-1 py-1 text-sm font-medium text-gray-700 ring-4 ring-gray-700/50">
                         <span>Project Name : </span>
                         <span className="text-red-500 font-bold">{name}</span>
                     </span>
@@ -228,7 +228,6 @@ export default function Token({
                         <span className="font-black">{sessionId}</span>
                     </span>
                     <span>
-                        {/* sr-only : Screen Reader Only */}
                         <label htmlFor="traceIdSelect" className="sr-only">
                             Select Trace ID
                         </label>
@@ -250,7 +249,7 @@ export default function Token({
                                     setSessionId('');
                                 }
                             }}
-                            className="px-1 py-1 max-w-sm rounded-lg text-stone-900 bg-stone-100 focus:outline-none focus:ring-2 focus:ring-stone-100"
+                            className="mr-4 px-1 py-1 max-w-sm rounded-lg text-stone-900 bg-stone-100 focus:outline-none focus:ring-2 focus:ring-stone-100"
                         >
                             {Object.keys(info).map((id, index) => (
                                 <option key={index} value={id}>
