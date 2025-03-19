@@ -6,8 +6,11 @@ import Summary from '@/app/(graphs)/summary/page';
 import { motion } from 'framer-motion';
 import type { ContentsProps } from '@/types/chart_types';
 
-const Contents = ({ height = 410, titlefontSize = 20 }: ContentsProps) => {
-    const showInfo: boolean = false;
+const Contents = ({
+    height = 410,
+    titlefontSize = 20,
+    showInfo = false,
+}: ContentsProps) => {
     return (
         <>
             <div className="mt-2 mx-4 grid gap-6 md:grid-cols-2">
