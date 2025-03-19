@@ -1,6 +1,7 @@
 import { ApexOptions } from 'apexcharts';
 
 export interface ContentsProps {
+    showInfo?: boolean;
     height?: number;
     titlefontSize?: number;
 }
