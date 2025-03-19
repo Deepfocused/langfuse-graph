@@ -126,7 +126,11 @@ Property 'height' is incompatible with index signature.
 Type 'any' is not assignable to type 'never'.
 */
 // 컴포넌트는 대문자
-export default function Token({ height = 640, titlefontSize = 28 }: any) {
+export default function Token({
+    height = 640,
+    titlefontSize = 28,
+    showInfo = true,
+}: any) {
     const [state, setState] = useState<ChartProps>({
         series: [],
         options: defaultChartOptions(titlefontSize),
@@ -208,45 +212,51 @@ export default function Token({ height = 640, titlefontSize = 28 }: any) {
     }, [traceId]);
     return (
         <>
-            <div className="flex justify-center gap-4">
-                <span className="rounded-md bg-gray-50 px-2 py-1 text-sm font-medium text-gray-600 ring-1 ring-gray-500/10">
-                    Project Name: {name}
-                </span>
-                <span className="rounded-md bg-red-50 px-2 py-1 text-sm font-medium text-red-700 ring-1 ring-red-600/10">
-                    User ID: {userId}
-                </span>
-                <span className="rounded-md bg-yellow-50 px-2 py-1 text-sm font-medium text-yellow-800 ring-1 ring-yellow-600/10">
-                    Session ID: {sessionId}
-                </span>
-                <span>
-                    <select
-                        value={traceId}
-                        onChange={(e) => {
-                            const selectedTraceId = e.target.value;
-                            setTraceId(selectedTraceId);
+            {showInfo && (
+                <div className="flex items-center justify-center gap-4">
+                    <span className="rounded-md bg-gray-100 px-1 py-1 text-sm font-medium text-gray-700 ring-4 ring-gray-700/50">
+                        Project Name : {name}
+                    </span>
+                    <span className="rounded-md bg-red-100 px-1 py-1 text-sm font-medium text-red-700 ring-4 ring-red-700/50">
+                        User ID : {userId}
+                    </span>
+                    <span className="rounded-md bg-yellow-100 px-1 py-1 text-sm font-medium text-yellow-700 ring-4 ring-yellow-700/50">
+                        Session ID : {sessionId}
+                    </span>
+                    <span>
+                        {/* sr-only : Screen Reader Only */}
+                        <label htmlFor="traceIdSelect" className="sr-only">
+                            Select Trace ID
+                        </label>
+                        <select
+                            id="traceIdSelect"
+                            value={traceId}
+                            onChange={(e) => {
+                                const selectedTraceId = e.target.value;
+                                setTraceId(selectedTraceId);
 
-                            if (selectedTraceId && info[selectedTraceId]) {
-                                const traceInfo = info[selectedTraceId];
-                                setName(traceInfo.name || '');
-                                setUserId(traceInfo.userId || '');
-                                setSessionId(traceInfo.sessionId || '');
-                            } else {
-                                setName('');
-                                setUserId('');
-                                setSessionId('');
-                            }
-                        }}
-                        className="py-1 px-2 block max-w-48 border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
-                    >
-                        <option value="">Select Trace ID</option>
-                        {Object.keys(info).map((id, index) => (
-                            <option key={index} value={id}>
-                                {id}
-                            </option>
-                        ))}
-                    </select>
-                </span>
-            </div>
+                                if (selectedTraceId && info[selectedTraceId]) {
+                                    const traceInfo = info[selectedTraceId];
+                                    setName(traceInfo.name || '');
+                                    setUserId(traceInfo.userId || '');
+                                    setSessionId(traceInfo.sessionId || '');
+                                } else {
+                                    setName('');
+                                    setUserId('');
+                                    setSessionId('');
+                                }
+                            }}
+                            className="px-1 py-1 max-w-48 rounded-lg border ring-1 ring-white-700/50"
+                        >
+                            {Object.keys(info).map((id, index) => (
+                                <option key={index} value={id}>
+                                    {id}
+                                </option>
+                            ))}
+                        </select>
+                    </span>
+                </div>
+            )}
             <ReactApexChart
                 className="mx-8 my-6"
                 options={state.options}
