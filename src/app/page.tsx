@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import Contents from '@/components/content';
 import { useInfo } from '@/context/InfoContext';
 
@@ -45,18 +45,23 @@ export default function Home() {
 
     return (
         <>
-            <div className="flex justify-center gap-4">
-                <span className="rounded-md bg-gray-50 px-2 py-1 text-sm font-medium text-gray-600 ring-1 ring-gray-500/10">
-                    Project Name: {name}
+            <div className="flex items-center justify-center gap-4 mb-2">
+                <span className="rounded-md bg-gray-100 px-1 py-1 text-sm font-medium text-gray-700 ring-4 ring-gray-700/50">
+                    Project Name : {name}
                 </span>
-                <span className="rounded-md bg-red-50 px-2 py-1 text-sm font-medium text-red-700 ring-1 ring-red-600/10">
-                    User ID: {userId}
+                <span className="rounded-md bg-red-100 px-1 py-1 text-sm font-medium text-red-700 ring-4 ring-red-700/50">
+                    User ID : {userId}
                 </span>
-                <span className="rounded-md bg-yellow-50 px-2 py-1 text-sm font-medium text-yellow-800 ring-1 ring-yellow-600/10">
-                    Session ID: {sessionId}
+                <span className="rounded-md bg-yellow-100 px-1 py-1 text-sm font-medium text-yellow-700 ring-4 ring-yellow-700/50">
+                    Session ID : {sessionId}
                 </span>
                 <span>
+                    {/* sr-only : Screen Reader Only */}
+                    <label htmlFor="traceIdSelect" className="sr-only">
+                        Select Trace ID
+                    </label>
                     <select
+                        id="traceIdSelect"
                         value={traceId}
                         onChange={(e) => {
                             const selectedTraceId = e.target.value;
@@ -73,9 +78,8 @@ export default function Home() {
                                 setSessionId('');
                             }
                         }}
-                        className="py-1 px-2 block max-w-48 border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
+                        className="px-1 py-1 max-w-48 rounded-lg border ring-1 ring-white-700/50"
                     >
-                        <option value="">Select Trace ID</option>
                         {Object.keys(info).map((id, index) => (
                             <option key={index} value={id}>
                                 {id}
