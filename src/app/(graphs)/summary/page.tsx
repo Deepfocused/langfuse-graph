@@ -75,6 +75,7 @@ const defaultChartOptions = (titlefontSize: number) => ({
         position: 'top',
         horizontalAlign: 'center',
         fontSize: '16px',
+        offsetY: -16,
     },
     fill: {
         type: 'solid',
@@ -204,7 +205,7 @@ export default function Summary({
                 <div className="flex items-center justify-center gap-4 mb-2">
                     <span className="rounded-md bg-gray-100 px-1 py-1 text-sm font-medium text-gray-700 ring-4 ring-gray-700/50">
                         <span>Project Name : </span>
-                        <span className="font-black">{name}</span>
+                        <span className="text-red-500 font-bold">{name}</span>
                     </span>
                     <span className="rounded-md bg-red-100 px-1 py-1 text-sm font-medium text-red-700 ring-4 ring-red-700/50">
                         <span>User ID : </span>
