@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import type { ChartProps } from '@/types/chart_types';
-import { transformDataForSummary as transformData } from '@/utils/util';
+import { transformDataForTime as transformData } from '@/utils/util';
 import dynamic from 'next/dynamic';
 import { useInfo } from '@/context/InfoContext';
 
@@ -10,9 +10,16 @@ const ReactApexChart = dynamic(() => import('react-apexcharts'), {
     ssr: false,
 }); // browser에서만 렌더링해야하므로 ssr을 끔
 
+/*
+ContentsProps 대신 any를 써야하는 이유 
+Type error: Type 'OmitWithTag<ContentsProps, keyof PageProps, "default">' does not satisfy the constraint '{ [x: string]: never; }'.
+Property 'height' is incompatible with index signature.
+Type 'any' is not assignable to type 'never'.
+*/
+// 컴포넌트는 대문자
 const defaultChartOptions = (titlefontSize: number) => ({
     title: {
-        text: '🔊 Summary 🔊',
+        text: '🎢 Inference Timeline 🎢',
         align: 'center',
         style: {
             fontSize: `${titlefontSize}px`,
@@ -27,11 +34,11 @@ const defaultChartOptions = (titlefontSize: number) => ({
             offsetX: 25,
             offsetY: 0,
         },
-        type: 'bar',
+        type: 'rangeBar',
         foreColor: '#FFFFFF',
         dropShadow: {
             enabled: true,
-            color: '#fff',
+            color: '#FFFFFF',
             top: 0,
             left: 0,
             blur: 21,
@@ -41,15 +48,12 @@ const defaultChartOptions = (titlefontSize: number) => ({
             enabled: false,
         },
     },
+    // colors: ['#69d2e7', '#FF4560'],
     plotOptions: {
         bar: {
-            horizontal: false,
-            columnWidth: '60%',
-            borderRadius: 5,
-            borderRadiusApplication: 'end',
-            dataLabels: {
-                position: 'top',
-            },
+            barHeight: '30%',
+            horizontal: true,
+            rangeBarGroupRows: true,
         },
     },
     dataLabels: {
@@ -58,16 +62,9 @@ const defaultChartOptions = (titlefontSize: number) => ({
             fontSize: '14px',
             colors: ['#FFFFFF'],
         },
-        offsetY: -18,
-        formatter: function (val: number) {
-            return val.toFixed();
+        formatter: function (val: Array<number>): string {
+            return (val[1] - val[0]).toFixed(1) + 's';
         },
-    },
-    stroke: {
-        show: true,
-        width: 5,
-        curve: 'smooth',
-        colors: ['transparent'],
     },
     legend: {
         show: true,
@@ -81,36 +78,68 @@ const defaultChartOptions = (titlefontSize: number) => ({
         opacity: 1,
     },
     xaxis: {
+        stepSize: 5,
         labels: {
             show: true,
             style: {
                 fontSize: '14px',
             },
+            // formatter: (val: number): number => val,
         },
     },
     yaxis: {
         labels: {
-            show: true,
+            show: false,
             style: {
                 fontSize: '14px',
             },
-            formatter: (val: number): number => Math.round(val),
         },
     },
     grid: {
         xaxis: {
             lines: {
-                show: false,
+                show: true,
             },
         },
         yaxis: {
             lines: {
-                show: true,
+                show: false,
             },
         },
     },
     tooltip: {
         theme: 'dark',
+        custom: function (opts: any) {
+            const w = opts.ctx.w;
+            let ylabel = '';
+            if (
+                w.config.series[opts.seriesIndex].data &&
+                w.config.series[opts.seriesIndex].data[opts.dataPointIndex]
+            ) {
+                ylabel =
+                    w.config.series[opts.seriesIndex].data[opts.dataPointIndex]
+                        .x;
+            }
+            let seriesName = w.config.series[opts.seriesIndex].name
+                ? w.config.series[opts.seriesIndex].name
+                : '';
+            const color = w.globals.colors[opts.seriesIndex];
+
+            return (
+                '<div class="apexcharts-tooltip-rangebar">' +
+                '<div> <span class="series-name" style="color: ' +
+                color +
+                '">' +
+                (seriesName ? seriesName : '') +
+                '</span></div>' +
+                '<div> <span class="category">' +
+                ylabel +
+                ' </span> <span class="value start-value">' +
+                (opts.y2 - opts.y1) +
+                '</span></div>' +
+                '</div>'
+            );
+        },
     },
 });
 
@@ -121,7 +150,8 @@ Property 'height' is incompatible with index signature.
 Type 'any' is not assignable to type 'never'.
 */
 // 컴포넌트는 대문자
-export default function Summary({
+
+export default function Time({
     height = 640,
     titlefontSize = 28,
     showInfo = true,
@@ -146,10 +176,7 @@ export default function Summary({
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const url = new URL(
-                    '/langfuse/summary',
-                    window.location.origin,
-                );
+                const url = new URL('/langfuse/time', window.location.origin);
                 // if (name) url.searchParams.append('name', name);
                 // if (userId) url.searchParams.append('userId', userId);
                 // if (sessionId) url.searchParams.append('sessionId', sessionId);
@@ -175,16 +202,6 @@ export default function Summary({
                     setState((prevState) => ({
                         ...prevState,
                         series: transformedData,
-                        options: {
-                            xaxis: {
-                                categories: [
-                                    'latency(s)',
-                                    'Input Token',
-                                    'Output Token',
-                                    'Call Count',
-                                ],
-                            },
-                        },
                     }));
                 }
             } catch (error) {
@@ -249,7 +266,7 @@ export default function Summary({
                 className="mx-8 my-6"
                 options={state.options}
                 series={state.series}
-                type="bar"
+                type="rangeBar"
                 height={height}
             />
         </>
