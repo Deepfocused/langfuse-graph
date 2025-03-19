@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import type { ContentsProps } from '@/types/chart_types';
 
 const Contents = ({ height = 410, titlefontSize = 20 }: ContentsProps) => {
+    const showInfo: boolean = false;
     return (
         <>
             <div className="mt-2 mx-4 grid gap-6 md:grid-cols-2">
@@ -25,7 +26,11 @@ const Contents = ({ height = 410, titlefontSize = 20 }: ContentsProps) => {
                         scroll={false}
                         prefetch={true}
                     >
-                        <Time height={height} titlefontSize={titlefontSize} />
+                        <Time
+                            height={height}
+                            titlefontSize={titlefontSize}
+                            showInfo={showInfo}
+                        />
                     </Link>
                 </motion.div>
                 <motion.div
@@ -43,7 +48,11 @@ const Contents = ({ height = 410, titlefontSize = 20 }: ContentsProps) => {
                         scroll={false}
                         prefetch={true}
                     >
-                        <Token height={height} titlefontSize={titlefontSize} />
+                        <Token
+                            height={height}
+                            titlefontSize={titlefontSize}
+                            showInfo={showInfo}
+                        />
                     </Link>
                 </motion.div>
             </div>
@@ -63,7 +72,11 @@ const Contents = ({ height = 410, titlefontSize = 20 }: ContentsProps) => {
                         scroll={false}
                         prefetch={true}
                     >
-                        <Call height={height} titlefontSize={titlefontSize} />
+                        <Call
+                            height={height}
+                            titlefontSize={titlefontSize}
+                            showInfo={showInfo}
+                        />
                     </Link>
                 </motion.div>
                 <motion.div
@@ -84,6 +97,7 @@ const Contents = ({ height = 410, titlefontSize = 20 }: ContentsProps) => {
                         <Summary
                             height={height}
                             titlefontSize={titlefontSize}
+                            showInfo={showInfo}
                         />
                     </Link>
                 </motion.div>
