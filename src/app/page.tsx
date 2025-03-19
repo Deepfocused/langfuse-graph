@@ -96,7 +96,7 @@ export default function Home() {
                 //  2xl:h-[50rem] 브라우저 너비 1536px 이상일 때
                 className="graphs-scrollbar overflow-y-scroll h-[30rem] sm:h-[35rem] lg:h-[40rem] xl:h-[45rem] 2xl:h-[50rem]"
             >
-                <Contents />
+                <Contents showInfo={false} />
             </main>
         </>
     );
