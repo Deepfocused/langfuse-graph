@@ -158,15 +158,18 @@ export default function Call({
     return (
         <>
             {showInfo && (
-                <div className="flex items-center justify-center gap-4">
+                <div className="flex items-center justify-center gap-4 mb-2">
                     <span className="rounded-md bg-gray-100 px-1 py-1 text-sm font-medium text-gray-700 ring-4 ring-gray-700/50">
-                        Project Name : {name}
+                        <span>Project Name : </span>
+                        <span className="font-black">{name}</span>
                     </span>
                     <span className="rounded-md bg-red-100 px-1 py-1 text-sm font-medium text-red-700 ring-4 ring-red-700/50">
-                        User ID : {userId}
+                        <span>User ID : </span>
+                        <span className="font-black">{userId}</span>
                     </span>
                     <span className="rounded-md bg-yellow-100 px-1 py-1 text-sm font-medium text-yellow-700 ring-4 ring-yellow-700/50">
-                        Session ID : {sessionId}
+                        <span>Session ID : </span>
+                        <span className="font-black">{sessionId}</span>
                     </span>
                     <span>
                         {/* sr-only : Screen Reader Only */}
@@ -191,7 +194,7 @@ export default function Call({
                                     setSessionId('');
                                 }
                             }}
-                            className="px-1 py-1 max-w-48 rounded-lg border ring-1 ring-white-700/50"
+                            className="px-1 py-1 max-w-sm rounded-lg text-stone-900 bg-stone-100 focus:outline-none focus:ring-2 focus:ring-stone-100"
                         >
                             {Object.keys(info).map((id, index) => (
                                 <option key={index} value={id}>
