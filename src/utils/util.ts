@@ -1,6 +1,9 @@
-import type { LlmType } from '@/types/chart_types';
+import type { LlmType } from '@/types/chartTypes';
 // 데이터 변환 함수
-export const transformDataForTime = (data: LlmType, x: string = 'Latency') => {
+export const transformDataForTime = (
+    data: LlmType,
+    x: string = 'latency(s)',
+) => {
     return Object.keys(data).map((key) => ({
         name: key,
         data: data[key].map((item: Array<number>) => ({
