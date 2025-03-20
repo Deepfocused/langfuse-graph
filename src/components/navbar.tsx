@@ -5,7 +5,13 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 const Navbar = () => {
-    const navItems = ['', 'time', 'token', 'call', 'summary'];
+    const navItems = [
+        '',
+        'latency',
+        'summary-latency',
+        'token',
+        'summary-token',
+    ];
     const pathname = usePathname();
     const [active, setActive] = useState<string>(() => {
         const currentPath = pathname.split('/').at(-1);
@@ -23,9 +29,9 @@ const Navbar = () => {
         <>
             <div className="mx-4 my-2 flex items-center justify-between max-[559px]:hidden">
                 <div className="border-b-4 border-blue-500 text-3xl font-bold">
-                    {active || 'graphs'}
+                    {active || 'All'}
                 </div>
-                <div className="flex gap-4 text-xl font-bold">
+                <div className="flex gap-3 text-xl font-bold">
                     {navItems.map((item) => (
                         <div
                             key={item}
@@ -36,14 +42,14 @@ const Navbar = () => {
                                 scroll={false}
                                 prefetch={item === ''}
                             >
-                                {item || 'graphs'}
+                                {item || 'All'}
                             </Link>
                         </div>
                     ))}
                 </div>
             </div>
             <div className="mx-4 my-2 flex items-center justify-center min-[560px]:hidden">
-                <div className="flex gap-4 text-lg font-bold max-[400PX]:text-sm max-[400PX]:gap-2.5">
+                <div className="flex gap-3 text-lg font-bold max-[400PX]:text-sm max-[400PX]:gap-2.5">
                     {navItems.map((item) => (
                         <div key={item}>
                             <Link
@@ -56,7 +62,7 @@ const Navbar = () => {
                                 scroll={false}
                                 prefetch={item === ''}
                             >
-                                {item || 'graphs'}
+                                {item || 'All'}
                             </Link>
                         </div>
                     ))}
