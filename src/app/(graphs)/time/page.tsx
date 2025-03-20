@@ -1,10 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import type { ChartProps } from '@/types/chart_types';
+import type { ChartProps } from '@/types/chartTypes';
 import { transformDataForTime as transformData } from '@/utils/util';
 import dynamic from 'next/dynamic';
-import { useInfo } from '@/context/InfoContext';
+import { useInfoStore } from '@/store/infoStore';
 
 const ReactApexChart = dynamic(() => import('react-apexcharts'), {
     ssr: false,
@@ -19,7 +19,7 @@ Type 'any' is not assignable to type 'never'.
 // 컴포넌트는 대문자
 const defaultChartOptions = (titlefontSize: number) => ({
     title: {
-        text: '🎢 Inference Timeline 🎢',
+        text: '🎢 Latency Timeline 🎢',
         align: 'center',
         style: {
             fontSize: `${titlefontSize}px`,
@@ -51,21 +51,26 @@ const defaultChartOptions = (titlefontSize: number) => ({
     // colors: ['#69d2e7', '#FF4560'],
     plotOptions: {
         bar: {
-            barHeight: '30%',
+            barHeight: '35%',
             borderRadius: 5,
             horizontal: true,
-            rangeBarGroupRows: true,
+            rangeBarGroupRows: false,
         },
     },
     dataLabels: {
         enabled: true,
         style: {
             fontSize: '14px',
-            colors: ['#FFFFFF'],
+            colors: ['#ffffff'],
         },
         formatter: function (val: Array<number>): string {
             return (val[1] - val[0]).toFixed(1) + 's';
         },
+    },
+    stroke: {
+        show: true,
+        width: 1,
+        curve: 'smooth',
     },
     legend: {
         show: true,
@@ -80,7 +85,10 @@ const defaultChartOptions = (titlefontSize: number) => ({
         opacity: 1,
     },
     xaxis: {
-        stepSize: 5,
+        title: {
+            text: 'time(s)',
+        },
+        stepSize: 7,
         labels: {
             show: true,
             style: {
@@ -91,7 +99,7 @@ const defaultChartOptions = (titlefontSize: number) => ({
     },
     yaxis: {
         labels: {
-            show: false,
+            show: true,
             style: {
                 fontSize: '14px',
             },
@@ -153,7 +161,7 @@ Type 'any' is not assignable to type 'never'.
 */
 // 컴포넌트는 대문자
 
-export default function Time({
+export default function Latency({
     height = 640,
     titlefontSize = 28,
     showInfo = true,
@@ -175,8 +183,8 @@ export default function Time({
         setSessionId,
         setTraceId,
         setInfo,
-    } = useInfo();
-    
+    } = useInfoStore();
+
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -206,11 +214,14 @@ export default function Time({
         const intervalId = setInterval(fetchData, fetchInterval);
         return () => clearInterval(intervalId);
     }, []);
-    
+
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const url = new URL('/langfuse/time', window.location.origin);
+                const url = new URL(
+                    '/langfuse/latency',
+                    window.location.origin,
+                );
                 // if (name) url.searchParams.append('name', name);
                 // if (userId) url.searchParams.append('userId', userId);
                 // if (sessionId) url.searchParams.append('sessionId', sessionId);
