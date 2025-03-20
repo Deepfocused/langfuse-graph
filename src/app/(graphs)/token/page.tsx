@@ -44,7 +44,7 @@ const defaultChartOptions = (titlefontSize: number) => ({
     // colors: ['#69d2e7', '#FF4560'],
     plotOptions: {
         bar: {
-            columnWidth: '60%',
+            columnWidth: '50%',
             horizontal: false,
             borderRadius: 5,
             borderRadiusApplication: 'end', // 'around', 'end'
@@ -56,7 +56,7 @@ const defaultChartOptions = (titlefontSize: number) => ({
                     style: {
                         fontSize: '15px',
                         fontWeight: 900,
-                        color: '#ffffff',
+                        color: '#FFFFFF',
                     },
                 },
             },
@@ -137,7 +137,6 @@ export default function Token({
         series: [],
         options: defaultChartOptions(titlefontSize),
     });
-
     const {
         name,
         userId,
@@ -150,7 +149,7 @@ export default function Token({
         setTraceId,
         setInfo,
     } = useInfo();
-    
+
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -211,11 +210,11 @@ export default function Token({
                         ...prevState,
                         series: [
                             {
-                                name: 'input token',
+                                name: 'Input Token',
                                 data: result['inputtoken'],
                             },
                             {
-                                name: 'output token',
+                                name: 'Iutput Token',
                                 data: result['outputtoken'],
                             },
                         ],
@@ -243,6 +242,7 @@ export default function Token({
         fetchData();
         // }, [name, userId, traceId, sessionId]);
     }, [traceId]);
+
     return (
         <>
             {showInfo && (
