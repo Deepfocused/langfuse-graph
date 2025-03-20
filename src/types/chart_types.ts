@@ -7,7 +7,7 @@ export interface ContentsProps {
 }
 
 export interface ChartProps<T = ApexOptions['series'], U = any> {
-    series: T;
+    series?: T;
     options?: U;
 }
 
@@ -30,7 +30,7 @@ export interface Infos {
     [key: string]: TraceInfo;
 }
 
-export interface InfoContextType {
+export interface InfoState {
     name: string;
     setName: (value: string) => void;
     userId: string;
