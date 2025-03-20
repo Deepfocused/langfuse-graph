@@ -205,16 +205,15 @@ export default function Token({
                             ...prevState,
                         }));
                     }
-
                     setState((prevState) => ({
                         ...prevState,
                         series: [
                             {
-                                name: 'Input Token',
+                                name: 'input token',
                                 data: result['inputtoken'],
                             },
                             {
-                                name: 'Output Token',
+                                name: 'output token',
                                 data: result['outputtoken'],
                             },
                         ],
