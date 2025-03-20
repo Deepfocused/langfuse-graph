@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import Contents from '@/components/content';
-import { useInfo } from '@/context/InfoContext';
+import { useInfoStore } from '@/store/infoStore';
 
 export default function Home() {
     const fetchInterval: number = 600000;
@@ -17,7 +17,7 @@ export default function Home() {
         setSessionId,
         setTraceId,
         setInfo,
-    } = useInfo();
+    } = useInfoStore();
 
     useEffect(() => {
         const fetchData = async () => {
