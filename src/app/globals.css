@@ -47,8 +47,8 @@ body {
 }
 
 .body-scrollbar::-webkit-scrollbar {
-    width: 0px; /* 가로 스크롤바 너비 0으로 설정 */
-    height: 0px; /* 스크롤바 높이 지정 (세로 스크롤바) */
+    width: 16px; /* 가로 스크롤바 너비 0으로 설정 */
+    height: 16px; /* 스크롤바 높이 지정 (세로 스크롤바) */
 }
 
 .body-scrollbar::-webkit-scrollbar-track {
@@ -62,8 +62,8 @@ body {
 }
 
 .graphs-scrollbar::-webkit-scrollbar {
-    width: 4px; /* 가로 스크롤바 너비 0으로 설정 */
-    height: 0px; /* 스크롤바 높이 지정 (세로 스크롤바) */
+    width: 8px; /* 가로 스크롤바 너비 0으로 설정 */
+    height: 8px; /* 스크롤바 높이 지정 (세로 스크롤바) */
 }
 
 .graphs-scrollbar::-webkit-scrollbar-track {
