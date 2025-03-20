@@ -110,7 +110,7 @@ export default function Call({
         setInfo,
     } = useInfo();
 
-        useEffect(() => {
+    useEffect(() => {
         const fetchData = async () => {
             try {
                 const url = new URL('/langfuse/info', window.location.origin);
