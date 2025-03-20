@@ -89,7 +89,17 @@ const processObservations = (
                         ),
                     );
                 } else {
-                    llmStartTime[modelIndex].push(0.0);
+                    // -가 되는 경우 : 실패한 경우
+                    llmStartTime[modelIndex].push(
+                        parseFloat(
+                            (
+                                (new Date(observation.startTime).getTime() -
+                                    new Date(startTime).getTime()) /
+                                1000
+                            ) // ms -> s
+                                .toFixed(2),
+                        ),
+                    );
                     llmEndTime[modelIndex].push(0.0);
                 }
 
@@ -128,7 +138,17 @@ const processObservations = (
                         ),
                     );
                 } else {
-                    llmStartTime[modelIndex].push(0.0);
+                    // -가 되는 경우 : 실패한 경우
+                    llmStartTime[modelIndex].push(
+                        parseFloat(
+                            (
+                                (new Date(observation.startTime).getTime() -
+                                    new Date(startTime).getTime()) /
+                                1000
+                            ) // ms -> s
+                                .toFixed(2),
+                        ),
+                    );
                     llmEndTime[modelIndex].push(0.0);
                 }
                 llmInputTokenCount[modelIndex].push(observation.promptTokens);
