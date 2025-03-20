@@ -1,4 +1,4 @@
-This is a Langfuse-graph project created based on [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app), using [Next.js](https://nextjs.org) framework.
+This is a LLM-in-Langfuse project created based on [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app), using [Next.js](https://nextjs.org) framework.
 
 ## Getting Started
 
@@ -28,8 +28,21 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
+## Deploy on Docker
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+docker build -t nextjs-llm-in-langfuse .
+docker run -p ${EXTERNAL_PORT}$:3000 --name llm-in-langfuse --detach --restart always nextjs-llm-in-langfuse
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## About .env file
+
+The contents of the .env file need to be adjusted according to your specific Langfuse project. Create a .env file in the root directory with the following variables:
+
+```
+LANGFUSE_PUBLIC_KEY=your_public_key
+LANGFUSE_SECRET_KEY=your_secret_key
+LANGFUSE_BASE_URL=your_base_url
+```
+
+You can obtain these credentials from your Langfuse project dashboard. These environment variables are essential for the application to connect to your Langfuse instance correctly.
