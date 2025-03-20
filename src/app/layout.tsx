@@ -1,8 +1,8 @@
-import { InfoProvider } from '@/context/InfoContext';
 import type { Metadata, Viewport } from 'next';
-import { Geist } from 'next/font/google';
+// import { Geist } from 'next/font/google';
+import Link from 'next/link';
 import Navbar from '@/components/navbar';
-
+import { Geist } from 'next/font/google';
 import './globals.css';
 
 // @theme, https://tailwindcss.com/docs/theme
@@ -47,24 +47,27 @@ export default function RootLayout({
         >
             <body
                 className={`${geistSans.className} antialiased body-scrollbar container mx-auto cursor-default`}
+                // className={`antialiased body-scrollbar container mx-auto min-w-3xl cursor-default`}
             >
-                <InfoProvider>
-                    <div className="mx-8 my-4">
-                        <header className="text-center">
-                            <p className="text-3xl font-bold">Langfuse-graph</p>
-                            <p className="mt-4 text-base text-gray-300">
-                                😃 Agent Evaluation 😃
-                            </p>
-                        </header>
+                <div className="mx-8 my-4">
+                    <header className="text-center">
+                        <p className="text-3xl font-bold transition hover:scale-121 hover:text-pink-700">
+                            <Link href={`/`} scroll={false} prefetch={true}>
+                                LLM in Langfuse
+                            </Link>
+                        </p>
+                        <p className="mt-4 text-base font-bold text-gray-300">
+                            😃 LLM Performance Evaluation 😃
+                        </p>
+                    </header>
 
-                        <div className="my-4">
-                            <div className="rounded-l-xl rounded-tr-xl border-solid border-2 border-blue-300 shadow-2xl shadow-blue-300">
-                                <Navbar />
-                                {children}
-                            </div>
+                    <div className="my-4">
+                        <div className="rounded-l-xl rounded-tr-xl border-solid border-2 border-blue-300 shadow-2xl shadow-blue-300">
+                            <Navbar />
+                            {children}
                         </div>
                     </div>
-                </InfoProvider>
+                </div>
             </body>
         </html>
     );
