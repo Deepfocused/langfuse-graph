@@ -81,20 +81,6 @@ const defaultChartOptions = (titlefontSize: number) => ({
         type: 'solid',
         opacity: 1,
     },
-    xaxis: {
-        labels: {
-            show: true,
-            style: {
-                fontSize: '14px',
-            },
-            formatter: (val: Array<number>): string => {
-                // Number(val[0]) 이렇게 안해주면 오류 발생
-                const startTime: number = Number(val[0]);
-                const endTime: number = Number(val[1]);
-                return `${startTime.toFixed(1)} ~ ${endTime.toFixed(1)}s`;
-            },
-        },
-    },
     yaxis: {
         labels: {
             show: true,
@@ -221,6 +207,20 @@ export default function Token({
                             ...prevState.options, // 기존 옵션 복사(반드시 필요)
                             xaxis: {
                                 categories: result['timeline'],
+                                labels: {
+                                    show: true,
+                                    style: {
+                                        fontSize: '14px',
+                                    },
+                                    formatter: (val: Array<number>): string => {
+                                        // Number(val[0]) 이렇게 안해주면 오류 발생
+                                        const startTime: number = Number(
+                                            val[0],
+                                        );
+                                        const endTime: number = Number(val[1]);
+                                        return `${startTime.toFixed(1)} ~ ${endTime.toFixed(1)}s`;
+                                    },
+                                },
                                 group: {
                                     style: {
                                         fontSize: '14px',
