@@ -3,7 +3,7 @@
 // https://nextjs.org/docs/app/api-reference/file-conventions/route
 import { type NextRequest, NextResponse } from 'next/server';
 import { Langfuse } from 'langfuse';
-import type { LlmType, Infos } from '@/types/chart_types';
+import type { LlmType, Infos } from '@/types/chartTypes';
 import {
     createCombinedArray,
     sortWithIndices,
@@ -56,7 +56,6 @@ const processObservations = (
         initializeArray(modelNumber);
     const llmOutputTokenCount: Array<Array<number>> =
         initializeArray(modelNumber);
-    const llmCallCount: Array<number> = Array(modelNumber).fill(0);
 
     for (const observation of observations) {
         if (observation.type === 'GENERATION') {
@@ -98,7 +97,6 @@ const processObservations = (
                 llmOutputTokenCount[modelIndex].push(
                     observation.completionTokens,
                 );
-                llmCallCount[modelIndex] += 1;
             }
         } else if (observation.type === 'SPAN') {
             const modelIndex = modelNames.indexOf('other');
@@ -137,7 +135,6 @@ const processObservations = (
                 llmOutputTokenCount[modelIndex].push(
                     observation.completionTokens,
                 );
-                llmCallCount[modelIndex] += 1;
             }
         }
     }
@@ -148,7 +145,6 @@ const processObservations = (
         llmEndTime,
         llmInputTokenCount,
         llmOutputTokenCount,
-        llmCallCount,
     };
 };
 
@@ -210,12 +206,10 @@ export async function GET(
                 ) {
                     modelNames.push(observation.model);
                 }
-            } else if (observation.type === 'SPAN') {
-                if (!modelNames.includes('other')) modelNames.push('other');
             }
         }
-        // ['other', 'llm model', ...] -> ['llm model', ...,  'other']
-        modelNames.reverse();
+
+        modelNames.push('other');
 
         const startTime: string = traceSelected.timestamp;
         const {
@@ -224,11 +218,10 @@ export async function GET(
             llmEndTime,
             llmInputTokenCount,
             llmOutputTokenCount,
-            llmCallCount,
         } = processObservations(observations, modelNames, startTime);
 
         switch (slug) {
-            case 'time':
+            case 'latency':
                 const llmTimeData: LlmType = createCombinedArray(
                     llmStartTime,
                     llmEndTime,
@@ -295,28 +288,40 @@ export async function GET(
                     },
                     { status: 200 },
                 );
-            case 'call':
-                const llmCallCountData = modelNames.reduce<LlmType<number>>(
-                    (result, name, index) => {
-                        result[name] = llmCallCount[index];
-                        return result;
-                    },
-                    {},
-                );
-                return NextResponse.json(llmCallCountData, { status: 200 });
-            case 'summary':
-                const llmSummaryData = modelNames.reduce<
+            case 'summary-latency': {
+                const exception = modelNames.indexOf('other');
+                llmLatency.splice(exception, 1);
+                modelNames.splice(exception, 1);
+
+                const llmSummaryLatencyData = modelNames.reduce<
                     LlmType<Array<number>>
                 >((result, name, index) => {
                     result[name] = [
                         llmLatency[index].reduce((a, b) => a + b, 0),
-                        llmInputTokenCount[index].reduce((a, b) => a + b, 0),
-                        llmOutputTokenCount[index].reduce((a, b) => a + b, 0),
-                        llmCallCount[index],
                     ];
                     return result;
                 }, {});
-                return NextResponse.json(llmSummaryData, { status: 200 });
+                return NextResponse.json(llmSummaryLatencyData, {
+                    status: 200,
+                });
+            }
+            case 'summary-token': {
+                const exception = modelNames.indexOf('other');
+                llmInputTokenCount.splice(exception, 1);
+                llmOutputTokenCount.splice(exception, 1);
+                modelNames.splice(exception, 1);
+
+                const llmSummaryTokenData = modelNames.reduce<
+                    LlmType<Array<number>>
+                >((result, name, index) => {
+                    result[name] = [
+                        llmInputTokenCount[index].reduce((a, b) => a + b, 0),
+                        llmOutputTokenCount[index].reduce((a, b) => a + b, 0),
+                    ];
+                    return result;
+                }, {});
+                return NextResponse.json(llmSummaryTokenData, { status: 200 });
+            }
             default:
                 return NextResponse.json(
                     { error: 'Something is wrong' },
