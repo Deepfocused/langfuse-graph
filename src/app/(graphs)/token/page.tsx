@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import type { ChartProps } from '@/types/chart_types';
+import type { ChartProps } from '@/types/chartTypes';
 import dynamic from 'next/dynamic';
-import { useInfo } from '@/context/InfoContext';
+import { useInfoStore } from '@/store/infoStore';
 
 const ReactApexChart = dynamic(() => import('react-apexcharts'), {
     ssr: false,
@@ -44,7 +44,7 @@ const defaultChartOptions = (titlefontSize: number) => ({
     // colors: ['#69d2e7', '#FF4560'],
     plotOptions: {
         bar: {
-            columnWidth: '50%',
+            columnWidth: '35%',
             horizontal: false,
             borderRadius: 5,
             borderRadiusApplication: 'end', // 'around', 'end'
@@ -148,7 +148,7 @@ export default function Token({
         setSessionId,
         setTraceId,
         setInfo,
-    } = useInfo();
+    } = useInfoStore();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -218,6 +218,7 @@ export default function Token({
                             },
                         ],
                         options: {
+                            ...prevState.options, // 기존 옵션 복사(반드시 필요)
                             xaxis: {
                                 categories: result['timeline'],
                                 group: {
