@@ -121,7 +121,7 @@ const defaultChartOptions = (titlefontSize: number) => ({
                     w.config.series[opts.seriesIndex].data[opts.dataPointIndex]
                         .x;
             }
-            let seriesName = w.config.series[opts.seriesIndex].name
+            const seriesName = w.config.series[opts.seriesIndex].name
                 ? w.config.series[opts.seriesIndex].name
                 : '';
             const color = w.globals.colors[opts.seriesIndex];
