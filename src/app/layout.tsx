@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from 'next';
-// import { Geist } from 'next/font/google';
 import Link from 'next/link';
 import Navbar from '@/components/navbar';
 import { Geist } from 'next/font/google';
