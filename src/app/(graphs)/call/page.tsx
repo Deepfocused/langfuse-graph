@@ -92,10 +92,10 @@ export default function Call({
     showInfo = true,
 }: any) {
     const fetchInterval: number = 600000;
-    const [state, setState] = useState<ChartProps>(() => ({
+    const [state, setState] = useState<ChartProps>({
         series: [],
         options: defaultChartOptions(titlefontSize),
-    }));
+    });
 
     const {
         name,
