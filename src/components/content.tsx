@@ -1,10 +1,12 @@
 import Link from 'next/link';
-import Time from '@/app/(graphs)/time/page';
+
+import Latency from '@/app/(graphs)/latency/page';
+import SummaryLatency from '@/app/(graphs)/summary-latency/page';
 import Token from '@/app/(graphs)/token/page';
-import Call from '@/app/(graphs)/call/page';
-import Summary from '@/app/(graphs)/summary/page';
+import SummaryToken from '@/app/(graphs)/summary-token/page';
+
 import { motion } from 'framer-motion';
-import type { ContentsProps } from '@/types/chart_types';
+import type { ContentsProps } from '@/types/chartTypes';
 
 const Contents = ({
     height = 410,
@@ -25,11 +27,11 @@ const Contents = ({
                 >
                     <Link
                         className="block border-2 rounded-xl border-fuchsia-200 shadow-lg shadow-fuchsia-300/50 transition hover:scale-103 hover:shadow-fuchsia-300"
-                        href="/time"
+                        href="/latency"
                         scroll={false}
                         prefetch={true}
                     >
-                        <Time
+                        <Latency
                             height={height}
                             titlefontSize={titlefontSize}
                             showInfo={showInfo}
@@ -47,11 +49,11 @@ const Contents = ({
                 >
                     <Link
                         className="block border-2 rounded-xl border-violet-200 shadow-lg shadow-violet-300/50 transition hover:scale-103 hover:shadow-violet-300"
-                        href="/token"
+                        href="/summary-latency"
                         scroll={false}
                         prefetch={true}
                     >
-                        <Token
+                        <SummaryLatency
                             height={height}
                             titlefontSize={titlefontSize}
                             showInfo={showInfo}
@@ -71,11 +73,11 @@ const Contents = ({
                 >
                     <Link
                         className="block border-2 rounded-xl border-fuchsia-200 shadow-lg shadow-fuchsia-300/50 transition hover:scale-103 hover:shadow-fuchsia-300"
-                        href="/call"
+                        href="/token"
                         scroll={false}
                         prefetch={true}
                     >
-                        <Call
+                        <Token
                             height={height}
                             titlefontSize={titlefontSize}
                             showInfo={showInfo}
@@ -93,11 +95,11 @@ const Contents = ({
                 >
                     <Link
                         className="block border-2 rounded-xl border-violet-200 shadow-lg shadow-violet-300/50 transition hover:scale-103 hover:shadow-violet-300"
-                        href="/summary"
+                        href="/summary-token"
                         scroll={false}
                         prefetch={true}
                     >
-                        <Summary
+                        <SummaryToken
                             height={height}
                             titlefontSize={titlefontSize}
                             showInfo={showInfo}
