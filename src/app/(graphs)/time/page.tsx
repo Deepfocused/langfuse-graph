@@ -52,6 +52,7 @@ const defaultChartOptions = (titlefontSize: number) => ({
     plotOptions: {
         bar: {
             barHeight: '30%',
+            borderRadius: 5,
             horizontal: true,
             rangeBarGroupRows: true,
         },
