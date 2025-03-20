@@ -1,6 +1,6 @@
 {
-    "name": "Langfuse-graph",
-    "version": "0.1.0",
+    "name": "LLM-in-Langfuse",
+    "version": "1.0.0",
     "private": true,
     "scripts": {
         "dev": "next dev --turbopack",
@@ -15,7 +15,8 @@
         "next": "^15.2.3",
         "react": "^19.0.0",
         "react-apexcharts": "^1.7.0",
-        "react-dom": "^19.0.0"
+        "react-dom": "^19.0.0",
+        "zustand": "^5.0.3"
     },
     "devDependencies": {
         "@eslint/eslintrc": "^3",
