@@ -91,6 +91,7 @@ export default function Call({
     titlefontSize = 28,
     showInfo = true,
 }: any) {
+    const fetchInterval: number = 600000;
     const [state, setState] = useState<ChartProps>({
         series: [],
         options: defaultChartOptions(titlefontSize),
@@ -106,7 +107,38 @@ export default function Call({
         setUserId,
         setSessionId,
         setTraceId,
+        setInfo,
     } = useInfo();
+
+        useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const url = new URL('/langfuse/info', window.location.origin);
+                const response = await fetch(url.toString());
+                if (response.ok) {
+                    let result;
+                    try {
+                        result = await response.json();
+                    } catch (jsonError) {
+                        console.error('Error fetching json:', jsonError);
+                        setInfo({});
+                    }
+                    setInfo(result);
+
+                    // 페이지 로딩시 초기값 지정
+                    const firstKey = Object.keys(result)[0];
+                    setName(result[firstKey].name || '');
+                    setUserId(result[firstKey].userId || '');
+                    setSessionId(result[firstKey].sessionId || '');
+                }
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+        fetchData();
+        const intervalId = setInterval(fetchData, fetchInterval);
+        return () => clearInterval(intervalId);
+    }, []);
 
     useEffect(() => {
         const fetchData = async () => {
