@@ -214,7 +214,7 @@ export default function Token({
                                 data: result['inputtoken'],
                             },
                             {
-                                name: 'Iutput Token',
+                                name: 'Output Token',
                                 data: result['outputtoken'],
                             },
                         ],
