@@ -91,7 +91,7 @@ const defaultChartOptions = (titlefontSize: number) => ({
                 // Number(val[0]) 이렇게 안해주면 오류 발생
                 const startTime: number = Number(val[0]);
                 const endTime: number = Number(val[1]);
-                return `${startTime.toFixed(1)}~${endTime.toFixed(1)}s`;
+                return `${startTime.toFixed(1)} ~ ${endTime.toFixed(1)}s`;
             },
         },
     },
